@@ -1,0 +1,63 @@
+Data set:
+https://data.seattle.gov/api/views/3xqu-vnum/rows.csv?accessType=DOWNLOAD&bom=true&format=true
+"Seattle_Crime_Stats_by_Police_Precinct_2008-Present.csv""
+(from:
+https://data.seattle.gov/Public-Safety/Seattle-Crime-Stats-by-Police-Precinct-2008-Presen/3xqu-vnum ,
+exported as "CSV for Excel")
+
+/////////
+
+Get user inputs
+	Filename
+		Must end with .csv (case insensitive)
+			(or we require a delimiter specification)
+		Warn for case sensitivity of filename (assume system which cares)
+	Precinct of focus
+
+Input data
+	CSV into 2D array
+
+Decide things
+	Weighted significances, whatever
+
+Provide output
+	Tell user our conclusion(s)
+	Provide option to loop back and get some different info?	
+
+/////////
+
+Data columns
+	http://spdblotter.seattle.gov/wp-content/uploads/2015/01/beat-map-2.png
+	https://www.projectknow.com/discover/arrests-across-america-dui/
+	1
+		Police Beat
+		LetterNumber
+		B-W (not all used) then 1-3 (every number exists for each letter)
+		All beats of a letter are in the same precinct (each precinct has a multiple of 3 beats)		
+	2
+		CRIME_TYPE
+		7 types
+		Homicide, Rape, Robbery, Assault, Larceny-Theft, Motor Vehicle Theft, Burglary
+	3
+		CRIME_DESCRIPTION
+		Same as CRIME_TYPE, except MVT says "Vehicle Theft is theft of a car, truck, motorcycle or any motor vehicle."
+	4
+		STAT_VALUE
+		Integer number of occurrences, including 0
+	5
+		REPORT_DATE
+		MM/DD/YY
+		Reported at beginning of month until 2014, then switches to end of month
+		Covers a month(?)
+	6
+		Sector
+		Made of three beats, designed as letters B-W (not all used)
+		17?
+		Project Know provides names for each, but boundaries different than SPD beat map
+	7
+		Precinct
+		5 in SPD jurisdiction: North, West, East, Southwest, South(east) (N, W, E, SW, SE)
+	8
+		Row_Value_ID
+		Initial row number
+		~27,489 total
