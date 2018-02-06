@@ -22,7 +22,7 @@ public class Robert {
 		inputPanel.add(new JLabel("Dates requested (MM/DD/YYYY):"));
 		inputPanel.add(date);
 		int result = JOptionPane.showConfirmDialog(null, inputPanel,
-				"Please Enter Filename, Precinct and Dates Requested",
+				"Please Enter Filename, Precinct and Dates Requested:",
 				JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
 			System.out.println("Filename value: " + filename.getText());
