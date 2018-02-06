@@ -30,7 +30,7 @@ Data columns
 	http://spdblotter.seattle.gov/wp-content/uploads/2015/01/beat-map-2.png
 	https://www.projectknow.com/discover/arrests-across-america-dui/
 	1
-		Police Beat
+		Police Beat0
 		LetterNumber
 		B-W (not all used) then 1-3 (every number exists for each letter)
 		All beats of a letter are in the same precinct (each precinct has a multiple of 3 beats)		
