@@ -30,4 +30,17 @@ public class Robert {
 			System.out.println("Date value: " + date.getText());
 		}
 	}
+
+	// public static String findDates(String[][] array) {
+	// String foundDates = "";
+	// Calendar today = Calendar.getInstance();
+	// DateFormat dateFormat = new SimpleDateFormat("mm-dd-yyyy");
+	// String currentDate = dateFormat.format(today.getTime());
+	// for (String[] row : array) {
+	// if (row.toString().compareTo(currentDate) < 0)
+	// ;
+	// foundDates = row.toString();
+	// }
+	// return foundDates;
+	// }
 }
