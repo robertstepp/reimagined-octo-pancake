@@ -14,7 +14,7 @@ import java.util.Collections;
 //import java.util.Date;
 //import java.util.List;
 
-import javax.swing.Box;
+//import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -24,6 +24,20 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Ross {
+	public static void printDates(ArrayList<LocalDate> mydates) {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+		for (LocalDate date : mydates) {
+			System.out.println(date.format(formatter));
+		}
+	}
+
+	public static void printDates(LocalDate mydate) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		System.out.println(mydate.format(formatter));
+	}
+
 	public static void printArray(ArrayList<String> al, String delim) {
 		for (String s : al)
 			System.out.print(s + delim);
@@ -116,7 +130,8 @@ public class Ross {
 		return list;
 	}
 
-	public static ArrayList<String[]> recordsFromText(String file, String del, String[] cols) throws IOException {
+	public static ArrayList<LocalDate> recordsFromText(String file, String del, String daFo, String[] cols)
+			throws IOException {
 		// The columnar positions of the fields we're recording unique or
 		// max/min values for
 		int bCol = -1, sCol = -1, pCol = -1, dCol = -1;
@@ -140,9 +155,9 @@ public class Ross {
 		// https://docs.oracle.com/javase/tutorial/datetime/iso/format.html
 		// First actual date encountered will become the initial startDate and
 		// endDate
-		LocalDate startDate = LocalDate.MIN;
-		LocalDate endDate = LocalDate.MAX;
-		LocalDate currDate = LocalDate.MAX;
+		LocalDate startDate = LocalDate.now();
+		LocalDate endDate = LocalDate.of(1900, 1, 1);
+		LocalDate currDate = LocalDate.of(1901, 1, 1);
 
 		// Our precious records! (from every line after the header until null)
 		ArrayList<String[]> theRecords = new ArrayList<String[]>();
@@ -169,7 +184,7 @@ public class Ross {
 				// Turn our date string into a LocalDate
 				// If the current record's date is earlier and/or later than our
 				// thus-far-seen extremes, it's the new extreme(s)
-				currDate = LocalDate.parse(splitLine[dCol], DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+				currDate = LocalDate.parse(splitLine[dCol], DateTimeFormatter.ofPattern(daFo));
 				if (currDate.isBefore(startDate))
 					startDate = currDate;
 				if (currDate.isAfter(endDate))
@@ -185,6 +200,9 @@ public class Ross {
 		// We're preferring the order from the file
 		// Collections.sort(precincts);
 
+		// printDates(startDate);
+		// printDates(endDate);
+
 		// To group our date extremes
 		ArrayList<LocalDate> dateRange = new ArrayList<LocalDate>();
 		dateRange.add(startDate);
@@ -196,17 +214,83 @@ public class Ross {
 		System.out.println(sectors.size());
 		printArray(precincts, ", ");
 		System.out.println(precincts.size());
-		return theRecords;
+
+		// printDates(dateRange);
+		return dateRange;
+		// return theRecords;
 	}
 
-	public static void getChoices(ArrayList<LocalDate> limits, String imgLoc, ArrayList<String> beatOpts,
-			ArrayList<String> precOpts) {
-		getDateRange(limits);
+	public static void getChoices(String dateForm, ArrayList<LocalDate> dateLimits, String imgLoc, String[] beatOpts,
+			String[] precOpts) {
+
+		getDateRange(dateForm, dateLimits);
+
+		// displayMap("src/beat-map-2.png");
 		displayMap(imgLoc);
+
+		String[] beats = { "q1", "r3" };
+		String[] precincts = { "n", "s" };
 		getBeatPrecinct(beatOpts, precOpts);
+
+		String[] types = { "Personal", "Property" };
+		getTypeOfCrime(types);
+
 	}
 
-	public static void getDateRange(ArrayList<LocalDate> extremes) {
+	/**
+	 * getDateRange uses a dialog box to obtain from the user the range of dates
+	 * to consider. Informs of the range available to them and, incidentally, of
+	 * the formatting required. (Strict matching of format, including
+	 * superfluous zeroes.)
+	 * 
+	 * @param dateFormat
+	 *            A String determining the date format printed and expected
+	 * @param dateLims
+	 *            ArrayList of LocalDate's. First element is earliest
+	 *            permissible date, second latest
+	 */
+	public static void getDateRange(String dateFormat, ArrayList<LocalDate> dateLims) {
+		LocalDate beginDate = LocalDate.now(), endDate = LocalDate.of(1900, 1, 1);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
+		boolean validRange = false;
+		while (!validRange) {
+			JPanel dPanel = new JPanel();
+			JTextField beginChoice = new JTextField(10);
+			dPanel.add(new JLabel("Beginning date:"));
+			dPanel.add(beginChoice);
+			JTextField endChoice = new JTextField(10);
+			dPanel.add(new JLabel("Ending date:"));
+			dPanel.add(endChoice);
+
+			JOptionPane.showConfirmDialog(null,
+					dPanel, "Indicate date range of interest: (Strictly formatted, from: "
+							+ dateLims.get(0).format(formatter) + " to " + dateLims.get(1).format(formatter) + ")",
+					JOptionPane.DEFAULT_OPTION);
+
+			beginDate = LocalDate.parse(beginChoice.getText(), DateTimeFormatter.ofPattern(dateFormat));
+			endDate = LocalDate.parse(endChoice.getText(), DateTimeFormatter.ofPattern(dateFormat));
+			if (!((beginDate.isBefore(dateLims.get(0)) || (endDate.isAfter(dateLims.get(1))))
+					|| (beginDate.isAfter(endDate)))) {
+				validRange = true;
+			} else {
+				// System.out.println("You have failed!");
+			}
+		}
+	}
+
+	public static void getBeatPrecinct(String[] precincts, String[] beats) {
+		JPanel inputArea = new JPanel();
+		JComboBox<?> precinct = new JComboBox<Object>(precincts);
+		JComboBox<?> beat = new JComboBox<Object>(beats);
+		inputArea.add(new JLabel("Precinct:"));
+		inputArea.add(precinct);
+		inputArea.add(new JLabel("Beat:"));
+		inputArea.add(beat);
+		JOptionPane.showConfirmDialog(null, inputArea, "Enter requested area:", JOptionPane.OK_CANCEL_OPTION);
+		// System.out.printf("Precinct: %s Beat: %s\n",
+		// precincts[precinct.getSelectedIndex()],
+		// beats[beat.getSelectedIndex()]);
+		// System.out.println("Precinct value: " + precinct.getText());
 
 	}
 
@@ -228,90 +312,48 @@ public class Ross {
 
 	}
 
-	public static String[] input() {
-		String[] types = { "Personal", "Property" };
-		// displayMap("src/beat-map-2.png");
-		// return types;
-		String[] precincts = { "n", "s" };
-		String[] beats = { "q1", "r3" };
-
-		String[] input = new String[5]; // Filename, Precinct, Beat, Date Range,
-										// Type (Personal/Property)
-
-		JPanel inputFilename = new JPanel();
-		JTextField filename = new JTextField(10);
-		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
-		inputFilename.add(filename);
-		JOptionPane.showConfirmDialog(null, inputFilename, "Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
-		System.out.println(filename.getText());
-
-		// Text boxes etc
-		JPanel inputDate = new JPanel();
-		JTextField startDate = new JTextField(10);
-		JTextField endDate = new JTextField(10);
-		inputDate.add(startDate);
-		inputDate.add(Box.createHorizontalStrut(15));
-		inputDate.add(new JLabel("End Date:"));
-		inputDate.add(endDate);
-		
-		JPanel inputArea = new JPanel();
-		JComboBox<?> precinct = new JComboBox<Object>(precincts);
-		JComboBox<?> beat = new JComboBox<Object>(beats);
-
+	public static void getTypeOfCrime(String[] types) {
 		JPanel inputType = new JPanel();
 		JComboBox<?> type = new JComboBox<Object>(types);
-
-		// Applying names etc inputDate.add(new JLabel("Start Date:"));
-		inputArea.add(new JLabel("Precinct:"));
-		inputArea.add(precinct);
-
-		inputDate.add(Box.createHorizontalStrut(15));
-
-		inputArea.add(new JLabel("Beat:"));
-		inputArea.add(beat);
-
 		inputType.add(new JLabel("Type requested:"));
 		inputType.add(type);
-
-		JOptionPane.showConfirmDialog(null, inputDate, "Enter requested dates:", JOptionPane.OK_CANCEL_OPTION);
-		JOptionPane.showConfirmDialog(null, inputArea, "Enter requested area:", JOptionPane.OK_CANCEL_OPTION);
-		JOptionPane.showConfirmDialog(null, inputType, "Enter requested type:",
-				JOptionPane.OK_CANCEL_OPTION); /*
-												 * The following is how to
-												 * return the data the user
-												 * inputs I was testing using an
-												 * output to see the returned
-												 * data.
-												 */
-
+		JOptionPane.showConfirmDialog(null, inputType, "Enter requested type:", JOptionPane.OK_CANCEL_OPTION);
 		// System.out.println(types[type.getSelectedIndex()]);
-		// System.out.println("Filename value: " + filename.getText());
-		// System.out.printf("Start date: %s End date: %s\n",
-		// startDate.getText(),
-		// endDate.getText());
-		// System.out.printf("Precinct: %s Beat: %s\n",
-		// precincts[precinct.getSelectedIndex()],
-		// beats[beat.getSelectedIndex()]);
-		// System.out.println("Precinct value: " + precinct.getText());
-		// System.out.println("Date value: " + date.getText());
 
-		return input;
+	}
+
+	public static void input() {
+
+		/*
+		 * JPanel inputFilename = new JPanel(); JTextField filename = new
+		 * JTextField(10); inputFilename.add(new
+		 * JLabel("Filename: (Case Sensitive)")); inputFilename.add(filename);
+		 * JOptionPane.showConfirmDialog(null, inputFilename,
+		 * "Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
+		 */
+		// System.out.println("Filename value: " + filename.getText());
+
 	}
 
 	public static void main(String[] args) throws IOException {
+		// Following block are currently hardcoded
 		final boolean debug = true;
 		String filename = "datasets/original raw data-DON'T MODIFY.csv";
 		String mapLoc = "src/beat-map-2.png";
 		String delimiter = ",";
-		input();
-		ArrayList<String> a = new ArrayList<String>();
-		// getChoiceFromOpts(a, a, a, mapLoc);
+		String dateFormat = "MM/dd/yyyy";
 
+		input();
 		String[] columns = getColDefs(filename, delimiter);
-		ArrayList<String[]> rows = new ArrayList<String[]>(recordsFromText(filename, delimiter, columns));
+		ArrayList<LocalDate> rows = new ArrayList<LocalDate>(recordsFromText(filename, delimiter, dateFormat, columns));
+
+		String[] bo = { "a", "b" };
+		String[] po = { "c", "d" };
+		getChoices(dateFormat, rows, mapLoc, bo, po);
 
 		if (debug) {
-			printArray(rows, " \t ", true);
+			// printArray(rows, " \t ", true);
+			printDates(rows);
 			System.out.println("---");
 			printArray(columns, " \t ");
 			System.out.println("---");
