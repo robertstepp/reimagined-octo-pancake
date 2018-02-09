@@ -25,26 +25,62 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Ross {
-	public static void printDates(ArrayList<LocalDate> mydates) {
+	/**
+	 * this printDates will print an ArrayList of LocalDate's with requested
+	 * format, one per line
+	 * 
+	 * @param mydates
+	 *            ArrayList of LocalDates to print
+	 * @param format
+	 *            Formatting String for LocalDate/DateTimeFormatter
+	 */
+	public static void printDates(ArrayList<LocalDate> mydates, String format) {
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
 
 		for (LocalDate date : mydates) {
 			System.out.println(date.format(formatter));
 		}
 	}
 
-	public static void printDates(LocalDate mydate) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+	/**
+	 * this printDates will print a single LocalDate with required formatting
+	 * and newline
+	 * 
+	 * @param mydate
+	 *            LocalDate to print
+	 * @param format
+	 *            Format String for DateTimeFormatter
+	 */
+	public static void printDates(LocalDate mydate, String format) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
 		System.out.println(mydate.format(formatter));
 	}
 
+	/**
+	 * this PrintArray is for an ArrayList of Strings, to be printed with a
+	 * delimiter after each String and a terminating newline
+	 * 
+	 * @param al
+	 *            ArrayList of Strings
+	 * @param delim
+	 *            Delimiter between Strings
+	 */
 	public static void printArray(ArrayList<String> al, String delim) {
 		for (String s : al)
 			System.out.print(s + delim);
 		System.out.println();
 	}
 
+	/**
+	 * this printArray is for an array of Strings, printed with delimiters and
+	 * terminating newline
+	 * 
+	 * @param sa
+	 *            Array of Strings
+	 * @param delim
+	 *            Delimiter after Springs
+	 */
 	public static void printArray(String[] sa, String delim) {
 		for (String s : sa)
 			System.out.print(s + delim);
@@ -53,16 +89,16 @@ public class Ross {
 
 	/**
 	 * The boolean is just to differentiate from printArray for
-	 * ArrayList-String's (vs. ArrayList-String[]'s) (Turns out greater
-	 * than/less than symbols don't show in javadoc/Eclipse hoverover...)
+	 * ArrayList-String's (vs. ArrayList-String[]'s)
 	 * 
 	 * @param outtie
+	 *            Our ArrayList of String Arrays (sic)
 	 * @param delim
+	 *            Delimiter between items printed
 	 * @param special
 	 *            Boolean value doesn't matter
 	 */
-	public static void printArray(ArrayList<String[]> outtie, String delim,
-			boolean special) {
+	public static void printArray(ArrayList<String[]> outtie, String delim, boolean special) {
 		// TODO: Either add ranges as a param, or remove "j" conditionals when
 		// done testing
 		int j = 0;
@@ -84,8 +120,7 @@ public class Ross {
 	 * @return A String ArrayList containing the column headings
 	 * @throws IOException
 	 */
-	public static String[] getColDefs(String file, String delim)
-			throws IOException {
+	public static String[] getColDefs(String file, String delim) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		// ArrayList<String> cols = new
 		// ArrayList<>(Arrays.asList(br.readLine().split(delim)));
@@ -104,8 +139,7 @@ public class Ross {
 	 * @throws IOException
 	 */
 	public static int numberOfRows(String file) throws IOException {
-		LineNumberReader lineReader = new LineNumberReader(
-				new FileReader(file));
+		LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
 		lineReader.skip(Long.MAX_VALUE);
 		int numRows = lineReader.getLineNumber();
 		lineReader.close();
@@ -153,8 +187,7 @@ public class Ross {
 	 * @return An ArrayList of Objects, each of which are super-fun themselves
 	 * @throws IOException
 	 */
-	public static magicTuple structFromStream(String file, String del,
-			String daFo, String[] cols) throws IOException {
+	public static magicTuple structFromStream(String file, String del, String daFo, String[] cols) throws IOException {
 		// The columnar positions of the fields we're recording possible values
 		// for
 		// Index [0=beat, 1=sector, 2=precinct, 3=date]
@@ -215,8 +248,7 @@ public class Ross {
 				if (!(precincts.contains(splitLine[whichCol[2]])))
 					precincts.add(splitLine[whichCol[2]]);
 				// Turn our date string into a LocalDate
-				currDate = LocalDate.parse(splitLine[whichCol[3]],
-						DateTimeFormatter.ofPattern(daFo));
+				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(daFo));
 				// If the current record's date is earlier and/or later than our
 				// thus-far-seen extremes, it becomes the new extreme(s)
 				if (currDate.isBefore(dates.get(0)))
@@ -239,13 +271,19 @@ public class Ross {
 		textVals.add(new ArrayList<String>(sectors));
 		textVals.add(new ArrayList<String>(precincts));
 
-		magicTuple allTheThings = new magicTuple(whichCol, textVals, dates,
-				theRecords);
+		magicTuple allTheThings = new magicTuple(whichCol, textVals, dates, theRecords);
 		return allTheThings;
 	}
 
-	public static void getChoices(String dateForm,
-			ArrayList<LocalDate> dateLimits, String imgLoc,
+	/** getChoices (via submethods) obtains from the user their choices after relevant options have been obtained from the data 
+	 * 
+	 * @param dateForm The formatting String for parsing and display of dates
+	 * @param dateLimits An LocalDate ArrayList with (0) the earliest permissible date and (1) the latest permissible date
+	 * @param imgLoc Path to the image (map) to be displayed
+	 * @param beatOpts A String ArrayList of beat options
+	 * @param precOpts String ArrayList of precinct options
+	 */
+	public static void getChoices(String dateForm, ArrayList<LocalDate> dateLimits, String imgLoc,
 			ArrayList<String> beatOpts, ArrayList<String> precOpts) {
 		getDateRange(dateForm, dateLimits);
 		displayMap(imgLoc);
@@ -268,10 +306,8 @@ public class Ross {
 	 *            ArrayList of LocalDate's. First element is earliest
 	 *            permissible date, second latest
 	 */
-	public static void getDateRange(String dateForm,
-			ArrayList<LocalDate> dateLims) {
-		LocalDate beginDate = LocalDate.now(),
-				endDate = LocalDate.of(1900, 1, 1);
+	public static void getDateRange(String dateForm, ArrayList<LocalDate> dateLims) {
+		LocalDate beginDate = LocalDate.now(), endDate = LocalDate.of(1900, 1, 1);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateForm);
 		boolean validRange = false;
 		while (!validRange) {
@@ -288,27 +324,19 @@ public class Ross {
 
 			JOptionPane.showConfirmDialog(null, dPanel,
 					"Please enter date range of interest: (Strictly formatted and from "
-							+ dateLims.get(0).format(formatter) + " to "
-							+ dateLims.get(1).format(formatter) + ")",
+							+ dateLims.get(0).format(formatter) + " to " + dateLims.get(1).format(formatter) + ")",
 					JOptionPane.DEFAULT_OPTION);
 
 			// Next two conditionals ensure that neither entry is blank and each
 			// contains "/". This is hardcoded and it would be better to handle
 			// the exception.
-			if (!((beginChoice.getText().equals(""))
-					|| (endChoice.getText().equals("")))) {
-				if ((beginChoice.getText().contains("/"))
-						&& (beginChoice.getText().contains("/"))) {
-					beginDate = LocalDate.parse(beginChoice.getText(),
-							formatter);
+			if (!((beginChoice.getText().equals("")) || (endChoice.getText().equals("")))) {
+				if ((beginChoice.getText().contains("/")) && (beginChoice.getText().contains("/"))) {
+					beginDate = LocalDate.parse(beginChoice.getText(), formatter);
 					endDate = LocalDate.parse(endChoice.getText(), formatter);
-					if (!((beginDate.isBefore(dateLims.get(0))
-							|| (endDate.isAfter(dateLims.get(1))))
-							|| (beginDate.isAfter(endDate)))) {
+					if (!((beginDate.isBefore(dateLims.get(0)) || (endDate.isAfter(dateLims.get(1))))
+							|| (beginDate.isAfter(endDate)))) 
 						validRange = true;
-						// printDates(beginDate);
-						// printDates(endDate);
-					}
 				}
 			}
 		}
@@ -320,8 +348,7 @@ public class Ross {
 	public static void displayMap(String mapLoc) {
 		JFrame frame = new JFrame();
 		ImageIcon icon = new ImageIcon(
-				new ImageIcon(mapLoc).getImage().getScaledInstance(-1, 1000,
-						Image.SCALE_SMOOTH));
+				new ImageIcon(mapLoc).getImage().getScaledInstance(-1, 1000, Image.SCALE_SMOOTH));
 		JLabel label = new JLabel(icon);
 		frame.add(label);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -343,13 +370,11 @@ public class Ross {
 		inputArea.add(precinct);
 		inputArea.add(new JLabel("Beat:"));
 		inputArea.add(beat);
-		JOptionPane.showConfirmDialog(null, inputArea, "Enter requested area:",
-				JOptionPane.OK_CANCEL_OPTION);
+		JOptionPane.showConfirmDialog(null, inputArea, "Enter requested area:", JOptionPane.OK_CANCEL_OPTION);
 		// System.out.printf("Precinct: %s Beat: %s\n",
 		// precincts[precinct.getSelectedIndex()],
 		// beats[beat.getSelectedIndex()]);
 		// System.out.println("Precinct value: " + precinct.getText());
-
 	}
 
 	/**
@@ -358,18 +383,20 @@ public class Ross {
 	 * @param theBeats
 	 * @param thePrecincts
 	 */
-	public static void getBeatPrecinct(ArrayList<String> theBeats,
-			ArrayList<String> thePrecincts) {
+	public static void getBeatPrecinct(ArrayList<String> theBeats, ArrayList<String> thePrecincts) {
 
 	}
 
+	/** Obtain from the user the type of crime they would like to focus on
+	 * 
+	 * @param types Array of Strings containing the general types of crimes available
+	 */
 	public static void getTypeOfCrime(String[] types) {
 		JPanel inputType = new JPanel();
 		JComboBox<?> type = new JComboBox<Object>(types);
 		inputType.add(new JLabel("Type requested:"));
 		inputType.add(type);
-		JOptionPane.showConfirmDialog(null, inputType, "Enter requested type:",
-				JOptionPane.OK_CANCEL_OPTION);
+		JOptionPane.showConfirmDialog(null, inputType, "Enter requested type:", JOptionPane.OK_CANCEL_OPTION);
 		// System.out.println(types[type.getSelectedIndex()]);
 	}
 
@@ -379,9 +406,7 @@ public class Ross {
 		JPanel inputFilename = new JPanel();
 		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
 		inputFilename.add(preFilename);
-		JOptionPane.showConfirmDialog(null, inputFilename,
-				"Please Enter Filename:",
-				JOptionPane.OK_CANCEL_OPTION);
+		JOptionPane.showConfirmDialog(null, inputFilename, "Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
 		System.out.println(fileName);
 		fileName = preFilename.getText();
 		return fileName;
@@ -423,10 +448,7 @@ public class Ross {
 		// recordsFromText()).
 		// The best way to get a sense of it is perhaps starting at the code
 		// below.
-		magicTuple allDat = structFromStream(filename,
-				delimiter,
-				dateFormat,
-				colDefs);
+		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
 
 		// PS I know not all the dialogs are popping up, but that's next on my
 		// agenda and
@@ -439,11 +461,7 @@ public class Ross {
 		// would allow methods/functions to take a pile of parameters but only
 		// allow returning
 		// a single variable.)
-		getChoices(dateFormat,
-				allDat.getDateVals(),
-				mapLoc,
-				allDat.getTextVals().get(0),
-				allDat.getTextVals().get(2));
+		getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0), allDat.getTextVals().get(2));
 		/************************************/
 		// PPS If you leave the applet in the background (IE with the map
 		// display), Eclipse might view it as still running
@@ -456,8 +474,7 @@ public class Ross {
 			printArray(allDat.getTextVals().get(2), ",");
 			System.out.println();
 			printArray(colDefs, " \t ");
-			System.out.println(
-					"=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			printArray(allDat.getTheRecs(), " \t ", true);
 		}
 	}
