@@ -468,7 +468,7 @@ public class Ross {
 		// (The image display is non-blocking.)
 
 		if (debug) {
-			printDates(allDat.getDateVals());
+			printDates(allDat.getDateVals(),dateFormat);
 			printArray(allDat.getTextVals().get(0), ",");
 			printArray(allDat.getTextVals().get(1), ",");
 			printArray(allDat.getTextVals().get(2), ",");
