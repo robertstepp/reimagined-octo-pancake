@@ -61,7 +61,8 @@ public class Ross {
 	 * @param special
 	 *            Boolean value doesn't matter
 	 */
-	public static void printArray(ArrayList<String[]> outtie, String delim, boolean special) {
+	public static void printArray(ArrayList<String[]> outtie, String delim,
+			boolean special) {
 		// TODO: Either add ranges as a param, or remove "j" conditionals when
 		// done testing
 		int j = 0;
@@ -83,7 +84,8 @@ public class Ross {
 	 * @return A String ArrayList containing the column headings
 	 * @throws IOException
 	 */
-	public static String[] getColDefs(String file, String delim) throws IOException {
+	public static String[] getColDefs(String file, String delim)
+			throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		// ArrayList<String> cols = new
 		// ArrayList<>(Arrays.asList(br.readLine().split(delim)));
@@ -102,7 +104,8 @@ public class Ross {
 	 * @throws IOException
 	 */
 	public static int numberOfRows(String file) throws IOException {
-		LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
+		LineNumberReader lineReader = new LineNumberReader(
+				new FileReader(file));
 		lineReader.skip(Long.MAX_VALUE);
 		int numRows = lineReader.getLineNumber();
 		lineReader.close();
@@ -150,7 +153,8 @@ public class Ross {
 	 * @return An ArrayList of Objects, each of which are super-fun themselves
 	 * @throws IOException
 	 */
-	public static magicTuple structFromStream(String file, String del, String daFo, String[] cols) throws IOException {
+	public static magicTuple structFromStream(String file, String del,
+			String daFo, String[] cols) throws IOException {
 		// The columnar positions of the fields we're recording possible values
 		// for
 		// Index [0=beat, 1=sector, 2=precinct, 3=date]
@@ -211,7 +215,8 @@ public class Ross {
 				if (!(precincts.contains(splitLine[whichCol[2]])))
 					precincts.add(splitLine[whichCol[2]]);
 				// Turn our date string into a LocalDate
-				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(daFo));
+				currDate = LocalDate.parse(splitLine[whichCol[3]],
+						DateTimeFormatter.ofPattern(daFo));
 				// If the current record's date is earlier and/or later than our
 				// thus-far-seen extremes, it becomes the new extreme(s)
 				if (currDate.isBefore(dates.get(0)))
@@ -234,11 +239,13 @@ public class Ross {
 		textVals.add(new ArrayList<String>(sectors));
 		textVals.add(new ArrayList<String>(precincts));
 
-		magicTuple allTheThings = new magicTuple(whichCol, textVals, dates, theRecords);
+		magicTuple allTheThings = new magicTuple(whichCol, textVals, dates,
+				theRecords);
 		return allTheThings;
 	}
 
-	public static void getChoices(String dateForm, ArrayList<LocalDate> dateLimits, String imgLoc,
+	public static void getChoices(String dateForm,
+			ArrayList<LocalDate> dateLimits, String imgLoc,
 			ArrayList<String> beatOpts, ArrayList<String> precOpts) {
 		getDateRange(dateForm, dateLimits);
 		displayMap(imgLoc);
@@ -261,8 +268,10 @@ public class Ross {
 	 *            ArrayList of LocalDate's. First element is earliest
 	 *            permissible date, second latest
 	 */
-	public static void getDateRange(String dateForm, ArrayList<LocalDate> dateLims) {
-		LocalDate beginDate = LocalDate.now(), endDate = LocalDate.of(1900, 1, 1);
+	public static void getDateRange(String dateForm,
+			ArrayList<LocalDate> dateLims) {
+		LocalDate beginDate = LocalDate.now(),
+				endDate = LocalDate.of(1900, 1, 1);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateForm);
 		boolean validRange = false;
 		while (!validRange) {
@@ -279,17 +288,22 @@ public class Ross {
 
 			JOptionPane.showConfirmDialog(null, dPanel,
 					"Please enter date range of interest: (Strictly formatted and from "
-							+ dateLims.get(0).format(formatter) + " to " + dateLims.get(1).format(formatter) + ")",
+							+ dateLims.get(0).format(formatter) + " to "
+							+ dateLims.get(1).format(formatter) + ")",
 					JOptionPane.DEFAULT_OPTION);
 
 			// Next two conditionals ensure that neither entry is blank and each
 			// contains "/". This is hardcoded and it would be better to handle
 			// the exception.
-			if (!((beginChoice.getText().equals("")) || (endChoice.getText().equals("")))) {
-				if ((beginChoice.getText().contains("/")) && (beginChoice.getText().contains("/"))) {
-					beginDate = LocalDate.parse(beginChoice.getText(), formatter);
+			if (!((beginChoice.getText().equals(""))
+					|| (endChoice.getText().equals("")))) {
+				if ((beginChoice.getText().contains("/"))
+						&& (beginChoice.getText().contains("/"))) {
+					beginDate = LocalDate.parse(beginChoice.getText(),
+							formatter);
 					endDate = LocalDate.parse(endChoice.getText(), formatter);
-					if (!((beginDate.isBefore(dateLims.get(0)) || (endDate.isAfter(dateLims.get(1))))
+					if (!((beginDate.isBefore(dateLims.get(0))
+							|| (endDate.isAfter(dateLims.get(1))))
 							|| (beginDate.isAfter(endDate)))) {
 						validRange = true;
 						// printDates(beginDate);
@@ -306,7 +320,8 @@ public class Ross {
 	public static void displayMap(String mapLoc) {
 		JFrame frame = new JFrame();
 		ImageIcon icon = new ImageIcon(
-				new ImageIcon(mapLoc).getImage().getScaledInstance(-1, 1000, Image.SCALE_SMOOTH));
+				new ImageIcon(mapLoc).getImage().getScaledInstance(-1, 1000,
+						Image.SCALE_SMOOTH));
 		JLabel label = new JLabel(icon);
 		frame.add(label);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -314,11 +329,12 @@ public class Ross {
 		frame.setVisible(true);
 	}
 
-/** transitioning to other version, below
- * 
- * @param precincts
- * @param beats
- */
+	/**
+	 * transitioning to other version, below
+	 * 
+	 * @param precincts
+	 * @param beats
+	 */
 	public static void getBeatPrecinct(String[] precincts, String[] beats) {
 		JPanel inputArea = new JPanel();
 		JComboBox<?> precinct = new JComboBox<Object>(precincts);
@@ -327,7 +343,8 @@ public class Ross {
 		inputArea.add(precinct);
 		inputArea.add(new JLabel("Beat:"));
 		inputArea.add(beat);
-		JOptionPane.showConfirmDialog(null, inputArea, "Enter requested area:", JOptionPane.OK_CANCEL_OPTION);
+		JOptionPane.showConfirmDialog(null, inputArea, "Enter requested area:",
+				JOptionPane.OK_CANCEL_OPTION);
 		// System.out.printf("Precinct: %s Beat: %s\n",
 		// precincts[precinct.getSelectedIndex()],
 		// beats[beat.getSelectedIndex()]);
@@ -335,12 +352,14 @@ public class Ross {
 
 	}
 
-	/** this version is a placeholder which takes the updated param datatypes
+	/**
+	 * this version is a placeholder which takes the updated param datatypes
 	 * 
 	 * @param theBeats
 	 * @param thePrecincts
 	 */
-	public static void getBeatPrecinct(ArrayList<String> theBeats, ArrayList<String> thePrecincts) {
+	public static void getBeatPrecinct(ArrayList<String> theBeats,
+			ArrayList<String> thePrecincts) {
 
 	}
 
@@ -349,11 +368,24 @@ public class Ross {
 		JComboBox<?> type = new JComboBox<Object>(types);
 		inputType.add(new JLabel("Type requested:"));
 		inputType.add(type);
-		JOptionPane.showConfirmDialog(null, inputType, "Enter requested type:", JOptionPane.OK_CANCEL_OPTION);
+		JOptionPane.showConfirmDialog(null, inputType, "Enter requested type:",
+				JOptionPane.OK_CANCEL_OPTION);
 		// System.out.println(types[type.getSelectedIndex()]);
 	}
 
-	public static void input() {
+	public static String input() {
+		String fileName = "";
+		JTextField preFilename = new JTextField(10);
+		JPanel inputFilename = new JPanel();
+		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
+		inputFilename.add(preFilename);
+		JOptionPane.showConfirmDialog(null, inputFilename,
+				"Please Enter Filename:",
+				JOptionPane.OK_CANCEL_OPTION);
+		System.out.println(fileName);
+		fileName = preFilename.getText();
+		return fileName;
+
 		/*
 		 * JPanel inputFilename = new JPanel(); JTextField filename = new
 		 * JTextField(10); inputFilename.add(new
@@ -373,24 +405,39 @@ public class Ross {
 		String dateFormat = "MM/dd/yyyy";
 
 		/************************************/
-		input();
-		
-		String[] colDefs = getColDefs(filename,delimiter);
-		// Here's the "magic" sauce, it's our custom "tuple" class, which consists at the
-		// first layer of four different named ArrayList/arrays. (textVals and theRecs have
-		// another layer of their own.) See magicTuple.java for the definition. Most changes
-		// for storing the data in here are in structFromStream() (renamed from recordsFromText()).
-		// The best way to get a sense of it is perhaps starting at the code below.
+		// Added the filename input
+		String tempFilename = "";
+		tempFilename = input();
+		if (tempFilename.length() > 0) {
+			filename = tempFilename;
+		}
+
+		String[] colDefs = getColDefs(filename, delimiter);
+		// Here's the "magic" sauce, it's our custom "tuple" class, which
+		// consists at the
+		// first layer of four different named ArrayList/arrays. (textVals and
+		// theRecs have
+		// another layer of their own.) See magicTuple.java for the definition.
+		// Most changes
+		// for storing the data in here are in structFromStream() (renamed from
+		// recordsFromText()).
+		// The best way to get a sense of it is perhaps starting at the code
+		// below.
 		magicTuple allDat = structFromStream(filename,
 				delimiter,
 				dateFormat,
 				colDefs);
-		
-		// PS I know not all the dialogs are popping up, but that's next on my agenda and
-		// should be easy. The date structuring/returning thing was the big time hog. (I was
-		// surprised to learn recently that it wasn't until the recent version of Apple's Swift
-		// that, IIRC, tuples became returnable with builtins. Seems odd to me that a language
-		// would allow methods/functions to take a pile of parameters but only allow returning
+
+		// PS I know not all the dialogs are popping up, but that's next on my
+		// agenda and
+		// should be easy. The date structuring/returning thing was the big time
+		// hog. (I was
+		// surprised to learn recently that it wasn't until the recent version
+		// of Apple's Swift
+		// that, IIRC, tuples became returnable with builtins. Seems odd to me
+		// that a language
+		// would allow methods/functions to take a pile of parameters but only
+		// allow returning
 		// a single variable.)
 		getChoices(dateFormat,
 				allDat.getDateVals(),
@@ -398,9 +445,10 @@ public class Ross {
 				allDat.getTextVals().get(0),
 				allDat.getTextVals().get(2));
 		/************************************/
-		// PPS If you leave the applet in the background (IE with the map display), Eclipse might view it as still running
+		// PPS If you leave the applet in the background (IE with the map
+		// display), Eclipse might view it as still running
 		// (The image display is non-blocking.)
-		
+
 		if (debug) {
 			printDates(allDat.getDateVals());
 			printArray(allDat.getTextVals().get(0), ",");
@@ -408,7 +456,8 @@ public class Ross {
 			printArray(allDat.getTextVals().get(2), ",");
 			System.out.println();
 			printArray(colDefs, " \t ");
-			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+			System.out.println(
+					"=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			printArray(allDat.getTheRecs(), " \t ", true);
 		}
 	}
