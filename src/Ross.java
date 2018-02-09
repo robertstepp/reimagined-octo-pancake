@@ -352,7 +352,7 @@ public class Ross {
 
 		input();
 		String[] columns = getColDefs(filename, delimiter);
-		ArrayList<LocalDate> rows = new ArrayList<LocalDate>(recordsFromText(filename, delimiter, dateFormat, columns));
+		//ArrayList<LocalDate> rows = new ArrayList<LocalDate>(recordsFromText(filename, delimiter, dateFormat, columns));
 
 		String[] bo = { "a", "b" };
 		String[] po = { "c", "d" };
