@@ -1,6 +1,7 @@
 package src;
 
 import java.awt.Image;
+import java.awt.List;
 import java.io.BufferedReader;
 //import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -130,42 +131,76 @@ public class Ross {
 		return list;
 	}
 
-	public static ArrayList<LocalDate> recordsFromText(String file, String del, String daFo, String[] cols)
-			throws IOException {
-		// The columnar positions of the fields we're recording unique or
-		// max/min values for
-		int bCol = -1, sCol = -1, pCol = -1, dCol = -1;
-		// Assumption: first column which contains keyword is the one we want
-		for (int c = 0; c < cols.length; ++c) {
-			String col = cols[c].toLowerCase();
-			if ((bCol == -1) && (col.contains("beat")))
-				bCol = c;
-			else if ((sCol == -1) && (col.contains("sector")))
-				sCol = c;
-			else if ((pCol == -1) && (col.contains("precinct")))
-				pCol = c;
-			else if ((dCol == -1) && (col.contains("date")))
-				dCol = c;
+	/**
+	 * structFromStream takes filepath, delimiter, date format, and column
+	 * keywords of interest. In return, it provides an ArrayList whose
+	 * first-dimension elements are: 0) the indices of columns of interest 1)
+	 * all relevant values which occur in those columns, and 2) the line-by-line
+	 * records themselves
+	 * 
+	 * @param file
+	 *            String path to the file to parse
+	 * @param del
+	 *            String delimiter which separates fields
+	 * @param daFo
+	 *            String date format which LocalDate parses with
+	 * @param cols
+	 *            String[] containing textual column definitions (from the
+	 *            header)
+	 * @return An ArrayList of Objects, each of which are super-fun themselves
+	 * @throws IOException
+	 */
+	public static magicTuple structFromStream(String file, String del, String daFo, String[] cols) throws IOException {
+		// The columnar positions of the fields we're recording possible values
+		// for
+		// Index [0=beat, 1=sector, 2=precinct, 3=date]
+		// TODO: This is hardcoded and would probably be more appropriately
+		// represented by a linked list or somesuch
+		int[] whichCol = { -1, -1, -1, -1 };
+		// Assumption: first column containing any occurrence of the keyword is
+		// the one we want
+		for (int q = 0; q < cols.length; ++q) {
+			String col = cols[q].toLowerCase();
+			if ((whichCol[0] == -1) && (col.contains("beat")))
+				whichCol[0] = q;
+			else if ((whichCol[1] == -1) && (col.contains("sector")))
+				whichCol[1] = q;
+			else if ((whichCol[2] == -1) && (col.contains("precinct")))
+				whichCol[2] = q;
+			else if ((whichCol[3] == -1) && (col.contains("date")))
+				whichCol[3] = q;
 		}
 
-		// For holding each unique value possible for the fields we'll present
-		// for user selection
-		ArrayList<String> beats = new ArrayList<String>(), sectors = new ArrayList<String>(),
-				precincts = new ArrayList<String>();
+		// For unique or extreme values for the fields we'll present for user
+		// selection
+		ArrayList<String> beats = new ArrayList<String>();
+		ArrayList<String> sectors = new ArrayList<String>();
+		ArrayList<String> precincts = new ArrayList<String>();
+		ArrayList<ArrayList<String>> textVals = new ArrayList<ArrayList<String>>();
+		textVals.add(new ArrayList<String>(beats));
+		textVals.add(new ArrayList<String>(sectors));
+		textVals.add(new ArrayList<String>(precincts));
+
+		ArrayList<LocalDate> dates = new ArrayList<LocalDate>();
+
 		// https://docs.oracle.com/javase/tutorial/datetime/iso/format.html
-		// First actual date encountered will become the initial startDate and
-		// endDate
-		LocalDate startDate = LocalDate.now();
-		LocalDate endDate = LocalDate.of(1900, 1, 1);
+		// Index 0 is earliest date
+		dates.add(LocalDate.now());
+		// Index 1 is latest date
+		dates.add(LocalDate.of(1900, 1, 1));
+		// currDate is date of current record
 		LocalDate currDate = LocalDate.of(1901, 1, 1);
 
-		// Our precious records! (from every line after the header until null)
+		// Our precious records (etc)! (read every line after the header
+		// until null)
+		// (I imagine there's a better (more dynamic) way to do this, just don't
+		// have the time to teach myself/research it at the moment)
 		ArrayList<String[]> theRecords = new ArrayList<String[]>();
 		theRecords.ensureCapacity(numberOfRows(file));
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		// Ditch first line (presumed header)
 		br.readLine();
-		// TODO: should this be a do-while loop? Not particularly important
+		// TODO: should this be a do-while loop? Not very important
 		String curLine = br.readLine();
 		String[] splitLine;
 		while (curLine != null) {
@@ -175,59 +210,53 @@ public class Ross {
 				theRecords.add(splitLine);
 				// Add each unique occurrence of beats, sectors, and precincts
 				// to our lists of possibilities
-				if (!(beats.contains(splitLine[bCol])))
-					beats.add(splitLine[bCol]);
-				if (!(sectors.contains(splitLine[sCol])))
-					sectors.add(splitLine[sCol]);
-				if (!(precincts.contains(splitLine[pCol])))
-					precincts.add(splitLine[pCol]);
+				if (!(beats.contains(splitLine[whichCol[0]])))
+					beats.add(splitLine[whichCol[0]]);
+				if (!(sectors.contains(splitLine[whichCol[1]])))
+					sectors.add(splitLine[whichCol[1]]);
+				if (!(precincts.contains(splitLine[whichCol[2]])))
+					precincts.add(splitLine[whichCol[2]]);
 				// Turn our date string into a LocalDate
+				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(daFo));
 				// If the current record's date is earlier and/or later than our
-				// thus-far-seen extremes, it's the new extreme(s)
-				currDate = LocalDate.parse(splitLine[dCol], DateTimeFormatter.ofPattern(daFo));
-				if (currDate.isBefore(startDate))
-					startDate = currDate;
-				if (currDate.isAfter(endDate))
-					endDate = currDate;
+				// thus-far-seen extremes, it becomes the new extreme(s)
+				if (currDate.isBefore(dates.get(0)))
+					dates.set(0, currDate);
+				if (currDate.isAfter(dates.get(1)))
+					dates.set(1, currDate);
 			}
 			curLine = br.readLine();
 		}
 		br.close();
 
-		// Make our lists of possibilities "naturally ordered" (alphabetical)
-		Collections.sort(beats);
-		Collections.sort(sectors);
-		// We're preferring the order from the file
-		// Collections.sort(precincts);
+		// Make our lists of textual possibilities "naturally ordered"
+		// (alphabetical) (We're preferring the order from the file for
+		// precincts (better reflects cardinal biases, orientation of map image,
+		// and reading direction))
+		// Collections.sort(beats);
+		// Collections.sort(sectors);
+		// Aggregates our ArrayLists of possible values
+		// Index 0 = beats
+		// 1 = sectors
+		// 2 = precincts
+		// 3 = dates
 
-		// printDates(startDate);
-		// printDates(endDate);
-
-		// To group our date extremes
-		ArrayList<LocalDate> dateRange = new ArrayList<LocalDate>();
-		dateRange.add(startDate);
-		dateRange.add(endDate);
-
-		printArray(beats, ", ");
-		System.out.println(beats.size());
-		printArray(sectors, ", ");
-		System.out.println(sectors.size());
-		printArray(precincts, ", ");
-		System.out.println(precincts.size());
-
-		// printDates(dateRange);
-		return dateRange;
-		// return theRecords;
+		// ArrayList<String> textVals = new ArrayList<String>();
+		// textVals.add(beats);
+		// textVals.add(sectors);
+		// textVals.add(precincts);
+		//
+		// ArrayList<LocalDate> dateVals = new ArrayList<LocalDate>();
+		// dateVals.add(dates);
+		// allTheThings.add(possVals);
+		magicTuple allTheThings = new magicTuple(whichCol, textVals, dates, theRecords);
+		return allTheThings;
 	}
 
-	public static void getChoices(String dateForm, ArrayList<LocalDate> dateLimits, String imgLoc, String[] beatOpts,
-			String[] precOpts) {
-
+	public static void getChoices(String dateForm, ArrayList<LocalDate> dateLimits, String imgLoc,
+			ArrayList<String> beatOpts, ArrayList<String> precOpts) {
 		getDateRange(dateForm, dateLimits);
 		displayMap(imgLoc);
-
-		String[] beats = { "q1", "r3" };
-		String[] precincts = { "n", "s" };
 		getBeatPrecinct(beatOpts, precOpts);
 
 		String[] types = { "Personal", "Property" };
@@ -255,7 +284,8 @@ public class Ross {
 			JPanel dPanel = new JPanel();
 			dPanel.add(new JLabel("Beginning date:"));
 			// TODO: Move information from titlebar to inside dialog?
-			// Each at 12 wide just barely fits informative titlebar on my computer
+			// Each at 12 wide just barely fits informative titlebar on my
+			// computer
 			JTextField beginChoice = new JTextField(12);
 			dPanel.add(beginChoice);
 			dPanel.add(new JLabel("Ending date:"));
@@ -350,20 +380,41 @@ public class Ross {
 		String delimiter = ",";
 		String dateFormat = "MM/dd/yyyy";
 
+		/************************************/
 		input();
-		String[] columns = getColDefs(filename, delimiter);
-		//ArrayList<LocalDate> rows = new ArrayList<LocalDate>(recordsFromText(filename, delimiter, dateFormat, columns));
-
-		String[] bo = { "a", "b" };
-		String[] po = { "c", "d" };
-		getChoices(dateFormat, rows, mapLoc, bo, po);
-
+		
+		String[] colDefs = getColDefs(filename,delimiter);
+		// Here's the "magic" sauce, it's our custom "tuple" class, which consists at the
+		// first layer of four different named ArrayList/arrays. (textVals and theRecs have
+		// another layer of their own.) See magicTuple.java for the definition. Most changes
+		// for storing the data in here are in structFromStream() (renamed from recordsFromText()).
+		// The best way to get a sense of it is perhaps starting at the code below.
+		magicTuple allDat = structFromStream(filename,
+				delimiter,
+				dateFormat,
+				colDefs);
+		
+		// PS I know not all the dialogs are popping up, but that's next on my agenda and
+		// should be easy. The date structuring/returning thing was the big time hog. (I was
+		// surprised to learn recently that it wasn't until the recent version of Apple's Swift
+		// that, IIRC, tuples became returnable with builtins. Seems odd to me that a language
+		// would allow methods/functions to take a pile of parameters but only allow returning
+		// a single variable.)
+		getChoices(dateFormat,
+				allDat.getDateVals(),
+				mapLoc,
+				allDat.getTextVals().get(0),
+				allDat.getTextVals().get(2));
+		/************************************/
+		// PPS If you leave the applet in the background (IE with the map display), Eclipse might view it as still running
+		// (The image display is non-blocking.)
+		
 		if (debug) {
-			// printArray(rows, " \t ", true);
-			printDates(rows);
-			System.out.println("---");
-			printArray(columns, " \t ");
-			System.out.println("---");
+			printDates(allDat.getDateVals());
+			printArray(allDat.getTextVals().get(0), "Is this a dummy param? Is this call even doing what it's supposed to?");
+			printArray(colDefs, " \t ");
+			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+			printArray(allDat.getTheRecs(), " \t ", true);
 		}
 	}
 }
