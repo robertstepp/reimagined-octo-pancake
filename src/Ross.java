@@ -249,31 +249,40 @@ public class Ross {
 	 *            ArrayList of LocalDate's. First element is earliest
 	 *            permissible date, second latest
 	 */
-	public static void getDateRange(String dateFormat, ArrayList<LocalDate> dateLims) {
+	public static void getDateRange(String dateForm, ArrayList<LocalDate> dateLims) {
 		LocalDate beginDate = LocalDate.now(), endDate = LocalDate.of(1900, 1, 1);
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateForm);
 		boolean validRange = false;
 		while (!validRange) {
 			JPanel dPanel = new JPanel();
-			JTextField beginChoice = new JTextField(10);
 			dPanel.add(new JLabel("Beginning date:"));
+			// TODO: Move information from titlebar to inside dialog?
+			// Each at 12 wide just barely fits informative titlebar on my computer
+			JTextField beginChoice = new JTextField(12);
 			dPanel.add(beginChoice);
-			JTextField endChoice = new JTextField(10);
 			dPanel.add(new JLabel("Ending date:"));
+			JTextField endChoice = new JTextField(12);
 			dPanel.add(endChoice);
 
-			JOptionPane.showConfirmDialog(null,
-					dPanel, "Indicate date range of interest: (Strictly formatted, from: "
+			JOptionPane.showConfirmDialog(null, dPanel,
+					"Please enter date range of interest: (Strictly formatted and from "
 							+ dateLims.get(0).format(formatter) + " to " + dateLims.get(1).format(formatter) + ")",
 					JOptionPane.DEFAULT_OPTION);
 
-			beginDate = LocalDate.parse(beginChoice.getText(), DateTimeFormatter.ofPattern(dateFormat));
-			endDate = LocalDate.parse(endChoice.getText(), DateTimeFormatter.ofPattern(dateFormat));
-			if (!((beginDate.isBefore(dateLims.get(0)) || (endDate.isAfter(dateLims.get(1))))
-					|| (beginDate.isAfter(endDate)))) {
-				validRange = true;
-			} else {
-				// System.out.println("You have failed!");
+			// Next two conditionals ensure that neither entry is blank and each
+			// contains "/". This is hardcoded and it would be better to handle
+			// the exception.
+			if (!((beginChoice.getText().equals("")) || (endChoice.getText().equals("")))) {
+				if ((beginChoice.getText().contains("/")) && (beginChoice.getText().contains("/"))) {
+					beginDate = LocalDate.parse(beginChoice.getText(), formatter);
+					endDate = LocalDate.parse(endChoice.getText(), formatter);
+					if (!((beginDate.isBefore(dateLims.get(0)) || (endDate.isAfter(dateLims.get(1))))
+							|| (beginDate.isAfter(endDate)))) {
+						validRange = true;
+						// printDates(beginDate);
+						// printDates(endDate);
+					}
+				}
 			}
 		}
 	}
