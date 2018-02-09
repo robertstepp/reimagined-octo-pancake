@@ -53,7 +53,7 @@ public class Ross {
 
 	/**
 	 * The boolean is just to differentiate from printArray for
-	 * ArrayList<String>'s (vs. ArrayList<String[]>'s) (Turns out greater
+	 * ArrayList-String's (vs. ArrayList-String[]'s) (Turns out greater
 	 * than/less than symbols don't show in javadoc/Eclipse hoverover...)
 	 * 
 	 * @param outtie
