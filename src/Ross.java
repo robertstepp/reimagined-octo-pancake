@@ -155,7 +155,7 @@ public class Ross {
 		// for
 		// Index [0=beat, 1=sector, 2=precinct, 3=date]
 		// TODO: This is hardcoded and would probably be more appropriately
-		// represented by a linked list or somesuch
+		// represented by a linked list or something
 		int[] whichCol = { -1, -1, -1, -1 };
 		// Assumption: first column containing any occurrence of the keyword is
 		// the one we want
@@ -176,13 +176,7 @@ public class Ross {
 		ArrayList<String> beats = new ArrayList<String>();
 		ArrayList<String> sectors = new ArrayList<String>();
 		ArrayList<String> precincts = new ArrayList<String>();
-		ArrayList<ArrayList<String>> textVals = new ArrayList<ArrayList<String>>();
-		textVals.add(new ArrayList<String>(beats));
-		textVals.add(new ArrayList<String>(sectors));
-		textVals.add(new ArrayList<String>(precincts));
-
 		ArrayList<LocalDate> dates = new ArrayList<LocalDate>();
-
 		// https://docs.oracle.com/javase/tutorial/datetime/iso/format.html
 		// Index 0 is earliest date
 		dates.add(LocalDate.now());
@@ -233,22 +227,13 @@ public class Ross {
 		// (alphabetical) (We're preferring the order from the file for
 		// precincts (better reflects cardinal biases, orientation of map image,
 		// and reading direction))
-		// Collections.sort(beats);
-		// Collections.sort(sectors);
-		// Aggregates our ArrayLists of possible values
-		// Index 0 = beats
-		// 1 = sectors
-		// 2 = precincts
-		// 3 = dates
+		Collections.sort(beats);
+		Collections.sort(sectors);
+		ArrayList<ArrayList<String>> textVals = new ArrayList<ArrayList<String>>();
+		textVals.add(new ArrayList<String>(beats));
+		textVals.add(new ArrayList<String>(sectors));
+		textVals.add(new ArrayList<String>(precincts));
 
-		// ArrayList<String> textVals = new ArrayList<String>();
-		// textVals.add(beats);
-		// textVals.add(sectors);
-		// textVals.add(precincts);
-		//
-		// ArrayList<LocalDate> dateVals = new ArrayList<LocalDate>();
-		// dateVals.add(dates);
-		// allTheThings.add(possVals);
 		magicTuple allTheThings = new magicTuple(whichCol, textVals, dates, theRecords);
 		return allTheThings;
 	}
@@ -284,8 +269,8 @@ public class Ross {
 			JPanel dPanel = new JPanel();
 			dPanel.add(new JLabel("Beginning date:"));
 			// TODO: Move information from titlebar to inside dialog?
-			// Each at 12 wide just barely fits informative titlebar on my
-			// computer
+			// Each at 12 wide just barely fits informative titlebar on MY
+			// computer...
 			JTextField beginChoice = new JTextField(12);
 			dPanel.add(beginChoice);
 			dPanel.add(new JLabel("Ending date:"));
@@ -329,6 +314,11 @@ public class Ross {
 		frame.setVisible(true);
 	}
 
+/** transitioning to other version, below
+ * 
+ * @param precincts
+ * @param beats
+ */
 	public static void getBeatPrecinct(String[] precincts, String[] beats) {
 		JPanel inputArea = new JPanel();
 		JComboBox<?> precinct = new JComboBox<Object>(precincts);
@@ -345,6 +335,11 @@ public class Ross {
 
 	}
 
+	/** this version is a placeholder which takes the updated param datatypes
+	 * 
+	 * @param theBeats
+	 * @param thePrecincts
+	 */
 	public static void getBeatPrecinct(ArrayList<String> theBeats, ArrayList<String> thePrecincts) {
 
 	}
@@ -356,11 +351,9 @@ public class Ross {
 		inputType.add(type);
 		JOptionPane.showConfirmDialog(null, inputType, "Enter requested type:", JOptionPane.OK_CANCEL_OPTION);
 		// System.out.println(types[type.getSelectedIndex()]);
-
 	}
 
 	public static void input() {
-
 		/*
 		 * JPanel inputFilename = new JPanel(); JTextField filename = new
 		 * JTextField(10); inputFilename.add(new
@@ -369,7 +362,6 @@ public class Ross {
 		 * "Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
 		 */
 		// System.out.println("Filename value: " + filename.getText());
-
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -411,7 +403,10 @@ public class Ross {
 		
 		if (debug) {
 			printDates(allDat.getDateVals());
-			printArray(allDat.getTextVals().get(0), "Is this a dummy param? Is this call even doing what it's supposed to?");
+			printArray(allDat.getTextVals().get(0), ",");
+			printArray(allDat.getTextVals().get(1), ",");
+			printArray(allDat.getTextVals().get(2), ",");
+			System.out.println();
 			printArray(colDefs, " \t ");
 			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			printArray(allDat.getTheRecs(), " \t ", true);
