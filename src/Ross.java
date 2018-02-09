@@ -224,8 +224,6 @@ public class Ross {
 			String[] precOpts) {
 
 		getDateRange(dateForm, dateLimits);
-
-		// displayMap("src/beat-map-2.png");
 		displayMap(imgLoc);
 
 		String[] beats = { "q1", "r3" };
@@ -287,6 +285,20 @@ public class Ross {
 		}
 	}
 
+	/**
+	 * Displays the Beat Map resized down.
+	 **/
+	public static void displayMap(String mapLoc) {
+		JFrame frame = new JFrame();
+		ImageIcon icon = new ImageIcon(
+				new ImageIcon(mapLoc).getImage().getScaledInstance(-1, 1000, Image.SCALE_SMOOTH));
+		JLabel label = new JLabel(icon);
+		frame.add(label);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
+	}
+
 	public static void getBeatPrecinct(String[] precincts, String[] beats) {
 		JPanel inputArea = new JPanel();
 		JComboBox<?> precinct = new JComboBox<Object>(precincts);
@@ -301,20 +313,6 @@ public class Ross {
 		// beats[beat.getSelectedIndex()]);
 		// System.out.println("Precinct value: " + precinct.getText());
 
-	}
-
-	public static void displayMap(String mapLoc) {
-		/*
-		 * Displays the Beat Map resized down.
-		 **/
-		JFrame frame = new JFrame();
-		ImageIcon icon = new ImageIcon(
-				new ImageIcon(mapLoc).getImage().getScaledInstance(-1, 1000, Image.SCALE_SMOOTH));
-		JLabel label = new JLabel(icon);
-		frame.add(label);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
 	}
 
 	public static void getBeatPrecinct(ArrayList<String> theBeats, ArrayList<String> thePrecincts) {
