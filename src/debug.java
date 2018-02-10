@@ -12,22 +12,26 @@ import java.util.ArrayList;
  *
  */
 public class debug {
+	public static void printFilename(String file) {
+		System.out.println("FILENAME/PATH PASSED: \t" + file);
+	}
+
 	/**
-	 * this printDates will print an ArrayList of LocalDate's with requested
-	 * format, one per line
+	 * this printDates will print an array of LocalDate's with requested format,
+	 * one per line
 	 * 
 	 * @param mydates
-	 *            ArrayList of LocalDates to print
+	 *            array of LocalDates to print
 	 * @param format
 	 *            Formatting String for LocalDate/DateTimeFormatter
 	 */
-	public static void printDates(ArrayList<LocalDate> mydates, String format) {
-
+	public static void printDates(LocalDate[] mydates, String format) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-
+		System.out.print("DATES PASSED (format of " + format + "): \t");
 		for (LocalDate date : mydates) {
-			System.out.println(date.format(formatter));
+			System.out.print(date.format(formatter) + ", ");
 		}
+		System.out.println();
 	}
 
 	/**
@@ -41,7 +45,7 @@ public class debug {
 	 */
 	public static void printDates(LocalDate mydate, String format) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-		System.out.println(mydate.format(formatter));
+		System.out.println("DATE PASSED (format of " + format + "): \t" + mydate.format(formatter));
 	}
 
 	/**
@@ -54,6 +58,7 @@ public class debug {
 	 *            Delimiter between Strings
 	 */
 	public static void printArray(ArrayList<String> al, String delim) {
+		System.out.print("ARRAYLIST<STRING> PASSED: \t");
 		for (String s : al)
 			System.out.print(s + delim);
 		System.out.println();
@@ -69,6 +74,7 @@ public class debug {
 	 *            Delimiter after Springs
 	 */
 	public static void printArray(String[] sa, String delim) {
+		System.out.print("STRING[] PASSED: \t");
 		for (String s : sa)
 			System.out.print(s + delim);
 		System.out.println();
@@ -89,6 +95,7 @@ public class debug {
 		// TODO: Either add ranges as a param, or remove "j" conditionals when
 		// done testing
 		int j = 0;
+		System.out.println("SOME OF ARRAYLIST<STRING[]> PASSED:");
 		for (String[] innie : outtie) {
 			if ((j < 3) || (j > outtie.size() - 4))
 				printArray(innie, " \t ");

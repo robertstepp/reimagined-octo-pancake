@@ -344,7 +344,6 @@ public class Ross {
 		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
 		inputFilename.add(preFilename);
 		JOptionPane.showConfirmDialog(null, inputFilename, "Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
-		System.out.println(fileName);
 		fileName = preFilename.getText();
 		return fileName;
 
@@ -375,7 +374,8 @@ public class Ross {
 		getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0), allDat.getTextVals().get(2));
 
 		if (debug) {
-			//src.debug.printDates(allDat.getDateVals(), dateFormat);
+			src.debug.printFilename(filename);
+			src.debug.printDates(allDat.getDateVals(), dateFormat);
 			src.debug.printArray(allDat.getTextVals().get(0), ",");
 			src.debug.printArray(allDat.getTextVals().get(1), ",");
 			src.debug.printArray(allDat.getTextVals().get(2), ",");
