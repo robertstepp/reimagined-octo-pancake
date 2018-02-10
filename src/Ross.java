@@ -338,50 +338,20 @@ public class Ross {
 	}
 
 	public static void main(String[] args) throws IOException {
-		// Following block are currently hardcoded
 		final boolean debug = true;
 		String filename = "datasets/original raw data-DON'T MODIFY.csv";
 		String mapLoc = "src/beat-map-2.png";
 		String delimiter = ",";
 		String dateFormat = "MM/dd/yyyy";
 
-		/************************************/
 		// Added the filename input
 		String tempFilename = "";
 		tempFilename = input();
-		if (tempFilename.length() > 0) {
+		if (tempFilename.length() > 0) 
 			filename = tempFilename;
-		}
-
 		String[] colDefs = getColDefs(filename, delimiter);
-		// Here's the "magic" sauce, it's our custom "tuple" class, which
-		// consists at the
-		// first layer of four different named ArrayList/arrays. (textVals and
-		// theRecs have
-		// another layer of their own.) See magicTuple.java for the definition.
-		// Most changes
-		// for storing the data in here are in structFromStream() (renamed from
-		// recordsFromText()).
-		// The best way to get a sense of it is perhaps starting at the code
-		// below.
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
-
-		// PS I know not all the dialogs are popping up, but that's next on my
-		// agenda and
-		// should be easy. The date structuring/returning thing was the big time
-		// hog. (I was
-		// surprised to learn recently that it wasn't until the recent version
-		// of Apple's Swift
-		// that, IIRC, tuples became returnable with builtins. Seems odd to me
-		// that a language
-		// would allow methods/functions to take a pile of parameters but only
-		// allow returning
-		// a single variable.)
 		getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0), allDat.getTextVals().get(2));
-		/************************************/
-		// PPS If you leave the applet in the background (IE with the map
-		// display), Eclipse might view it as still running
-		// (The image display is non-blocking.)
 
 		if (debug) {
 			src.debug.printDates(allDat.getDateVals(),dateFormat);
