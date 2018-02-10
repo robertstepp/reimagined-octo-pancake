@@ -26,90 +26,6 @@ import javax.swing.JTextField;
 
 public class Ross {
 	/**
-	 * this printDates will print an ArrayList of LocalDate's with requested
-	 * format, one per line
-	 * 
-	 * @param mydates
-	 *            ArrayList of LocalDates to print
-	 * @param format
-	 *            Formatting String for LocalDate/DateTimeFormatter
-	 */
-	public static void printDates(ArrayList<LocalDate> mydates, String format) {
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-
-		for (LocalDate date : mydates) {
-			System.out.println(date.format(formatter));
-		}
-	}
-
-	/**
-	 * this printDates will print a single LocalDate with required formatting
-	 * and newline
-	 * 
-	 * @param mydate
-	 *            LocalDate to print
-	 * @param format
-	 *            Format String for DateTimeFormatter
-	 */
-	public static void printDates(LocalDate mydate, String format) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-		System.out.println(mydate.format(formatter));
-	}
-
-	/**
-	 * this PrintArray is for an ArrayList of Strings, to be printed with a
-	 * delimiter after each String and a terminating newline
-	 * 
-	 * @param al
-	 *            ArrayList of Strings
-	 * @param delim
-	 *            Delimiter between Strings
-	 */
-	public static void printArray(ArrayList<String> al, String delim) {
-		for (String s : al)
-			System.out.print(s + delim);
-		System.out.println();
-	}
-
-	/**
-	 * this printArray is for an array of Strings, printed with delimiters and
-	 * terminating newline
-	 * 
-	 * @param sa
-	 *            Array of Strings
-	 * @param delim
-	 *            Delimiter after Springs
-	 */
-	public static void printArray(String[] sa, String delim) {
-		for (String s : sa)
-			System.out.print(s + delim);
-		System.out.println();
-	}
-
-	/**
-	 * The boolean is just to differentiate from printArray for
-	 * ArrayList-String's (vs. ArrayList-String[]'s)
-	 * 
-	 * @param outtie
-	 *            Our ArrayList of String Arrays (sic)
-	 * @param delim
-	 *            Delimiter between items printed
-	 * @param special
-	 *            Boolean value doesn't matter
-	 */
-	public static void printArray(ArrayList<String[]> outtie, String delim, boolean special) {
-		// TODO: Either add ranges as a param, or remove "j" conditionals when
-		// done testing
-		int j = 0;
-		for (String[] innie : outtie) {
-			if ((j < 10) || (j > outtie.size() - 10))
-				printArray(innie, " \t ");
-			++j;
-		}
-	}
-
-	/**
 	 * getColDefs finds column definitions from a text file's header
 	 * (Assumption: single line header.)
 	 * 
@@ -468,14 +384,14 @@ public class Ross {
 		// (The image display is non-blocking.)
 
 		if (debug) {
-			printDates(allDat.getDateVals(),dateFormat);
-			printArray(allDat.getTextVals().get(0), ",");
-			printArray(allDat.getTextVals().get(1), ",");
-			printArray(allDat.getTextVals().get(2), ",");
+			src.debug.printDates(allDat.getDateVals(),dateFormat);
+			src.debug.printArray(allDat.getTextVals().get(0), ",");
+			src.debug.printArray(allDat.getTextVals().get(1), ",");
+			src.debug.printArray(allDat.getTextVals().get(2), ",");
 			System.out.println();
-			printArray(colDefs, " \t ");
+			src.debug.printArray(colDefs, " \t ");
 			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-			printArray(allDat.getTheRecs(), " \t ", true);
+			src.debug.printArray(allDat.getTheRecs(), " \t ", true);
 		}
 	}
 }
