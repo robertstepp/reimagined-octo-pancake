@@ -137,13 +137,9 @@ public class Ross {
 		daDates[0] = LocalDate.now();
 		// Index 1 is latest date found
 		daDates[1] = LocalDate.of(1900, 1, 1);
-		// currDate is date of current record
+		// currDate is date of the current record
 		LocalDate currDate = LocalDate.of(1901, 1, 1);
 
-		// Our precious records (etc)! (read every line after the header
-		// until null)
-		// (I imagine there's a better (more dynamic) way to do this, just don't
-		// have the time to teach myself/research it at the moment)
 		ArrayList<String[]> theRecords = new ArrayList<String[]>();
 		theRecords.ensureCapacity(numberOfRows(file));
 		BufferedReader br = new BufferedReader(new FileReader(file));
@@ -214,19 +210,20 @@ public class Ross {
 	 * @param precOpts
 	 *            String ArrayList of precinct options
 	 */
-	public static void getChoices(String dateForm,
+	public static LocalDate[] getChoices(String dateForm,
 			LocalDate[] dateLimits,
 			String imgLoc,
 			String[] beatOpts,
 			String[] precOpts) {
 		
-		getDateRange(dateForm, dateLimits);
+		LocalDate[] dateRangeChosen = getDateRange(dateForm, dateLimits);
 		displayMap(imgLoc);
 		getBeatPrecinct(beatOpts, precOpts);
 
 		String[] types = { "Personal", "Property" };
 		getTypeOfCrime(types);
 
+		return dateRangeChosen;
 	}
 
 	/**
@@ -241,10 +238,14 @@ public class Ross {
 	 *            ArrayList of LocalDate's. First element is earliest
 	 *            permissible date, second latest
 	 */
-	public static void getDateRange(String dateForm, LocalDate[] dateLims) {
-		LocalDate beginDate = LocalDate.now(), endDate = LocalDate.of(1900, 1, 1);
+	public static LocalDate[] getDateRange(String dateForm, LocalDate[] dateLims) {
+		LocalDate[] datesChosen = new LocalDate[2];
+		datesChosen[0]=LocalDate.now();
+		datesChosen[1]=LocalDate.of(1900, 1, 1);
+
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateForm);
 		boolean validRange = false;
+
 		while (!validRange) {
 			JPanel dPanel = new JPanel();
 			dPanel.add(new JLabel("Beginning date:"));
@@ -268,19 +269,20 @@ public class Ross {
 			// the exception. (B/C infinite other unparseable input possible)
 			if (!((beginChoice.getText().equals("")) || (endChoice.getText().equals("")))) {
 				if ((beginChoice.getText().contains("/")) && (beginChoice.getText().contains("/"))) {
-					beginDate = LocalDate.parse(beginChoice.getText(), formatter);
-					endDate = LocalDate.parse(endChoice.getText(), formatter);
-					if (!((beginDate.isBefore(dateLims[0]) || (endDate.isAfter(dateLims[1])))
-							|| (beginDate.isAfter(endDate))))
+					datesChosen[0] = LocalDate.parse(beginChoice.getText(), formatter);
+					datesChosen[1] = LocalDate.parse(endChoice.getText(), formatter);
+					if (!((datesChosen[0].isBefore(dateLims[0]) || (datesChosen[1].isAfter(dateLims[1])))
+							|| (datesChosen[0].isAfter(datesChosen[1]))))
 						validRange = true;
 				}
 			} else {
 				// If no entry, assume whole range is desired
-				beginDate = dateLims[0];
-				endDate = dateLims[1];
+				datesChosen[0] = dateLims[0];
+				datesChosen[1] = dateLims[1];
 				validRange = true;
 			}
 		}
+		return datesChosen;
 	}
 
 	/**
@@ -364,8 +366,11 @@ public class Ross {
 		if (tempFilename.length() > 0)
 			filename = tempFilename;
 		String[] colDefs = getColDefs(filename, delimiter);
+		// structFromStream sets allDat's dateVals to the range AVAILABLE
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
-		getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0), allDat.getTextVals().get(2));
+		// this RESETS allDat's dateVals to those CHOSEN by user input 
+		// (probably will end up having getChoices modify allDat itself...)
+		allDat.setDateVals(getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0), allDat.getTextVals().get(2)));
 
 		if (DEBUG) {
 			src.debug.printFilename(filename);
