@@ -248,15 +248,16 @@ public class Ross {
 		while (!validRange) {
 			JPanel dPanel = new JPanel();
 			dPanel.add(new JLabel("Beginning date:"));
-			// TODO: Move information from titlebar to inside dialog?
-			// Each at 12 wide just barely fits informative titlebar on MY
-			// computer...
 			JTextField beginChoice = new JTextField(12);
 			dPanel.add(beginChoice);
+			
 			dPanel.add(new JLabel("Ending date:"));
 			JTextField endChoice = new JTextField(12);
 			dPanel.add(endChoice);
 
+			// TODO: Move information from titlebar to inside dialog?
+			// Each JTextField at 12 wide just barely fits informative titlebar on MY
+			// computer...
 			JOptionPane.showConfirmDialog(null,
 					dPanel, "Please enter date range of interest: (Strictly formatted and from "
 							+ dateLims[0].format(formatter) + " to " + dateLims[1].format(formatter) + ")",
@@ -264,7 +265,7 @@ public class Ross {
 
 			// Two nested conditions ensure that neither entry is blank and each
 			// contains "/". This is hardcoded and it would be better to handle
-			// the exception.
+			// the exception. (B/C infinite other unparseable input possible)
 			if (!((beginChoice.getText().equals("")) || (endChoice.getText().equals("")))) {
 				if ((beginChoice.getText().contains("/")) && (beginChoice.getText().contains("/"))) {
 					beginDate = LocalDate.parse(beginChoice.getText(), formatter);
@@ -334,6 +335,8 @@ public class Ross {
 		inputType.add(new JLabel("Type requested:"));
 		inputType.add(type);
 		JOptionPane.showConfirmDialog(null, inputType, "Enter requested type:", JOptionPane.OK_CANCEL_OPTION);
+		// Will aim to make all debug output run from main(), that way there's a
+		// builtin check to ensure actual data needing to be returned/passed is
 		// System.out.println(types[type.getSelectedIndex()]);
 	}
 
@@ -346,23 +349,14 @@ public class Ross {
 		JOptionPane.showConfirmDialog(null, inputFilename, "Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
 		fileName = preFilename.getText();
 		return fileName;
-
-		/*
-		 * JPanel inputFilename = new JPanel(); JTextField filename = new
-		 * JTextField(10); inputFilename.add(new
-		 * JLabel("Filename: (Case Sensitive)")); inputFilename.add(filename);
-		 * JOptionPane.showConfirmDialog(null, inputFilename,
-		 * "Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
-		 */
-		// System.out.println("Filename value: " + filename.getText());
 	}
 
 	public static void main(String[] args) throws IOException {
-		final boolean debug = true;
 		String filename = "datasets/original raw data-DON'T MODIFY.csv";
 		String mapLoc = "src/beat-map-2.png";
 		String delimiter = ",";
 		String dateFormat = "MM/dd/yyyy";
+		final boolean DEBUG = true;
 
 		// Added the filename input
 		String tempFilename = "";
@@ -373,7 +367,7 @@ public class Ross {
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
 		getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0), allDat.getTextVals().get(2));
 
-		if (debug) {
+		if (DEBUG) {
 			src.debug.printFilename(filename);
 			src.debug.printDates(allDat.getDateVals(), dateFormat);
 			src.debug.printArray(allDat.getTextVals().get(0), ",");
