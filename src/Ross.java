@@ -216,14 +216,14 @@ public class Ross {
 			String[] beatOpts,
 			String[] precOpts) {
 		
-		LocalDate[] dateRangeChosen = getDateRange(dateForm, dateLimits);
+		LocalDate[] dateRangeChoice = getDateRange(dateForm, dateLimits);
 		displayMap(imgLoc);
-		getBeatPrecinct(beatOpts, precOpts);
+		String[] bpChoice = getBeatPrecinct(beatOpts, precOpts);
 
 		String[] types = { "Personal", "Property" };
 		getTypeOfCrime(types);
 
-		return dateRangeChosen;
+		return dateRangeChoice;
 	}
 
 	/**
@@ -308,8 +308,9 @@ public class Ross {
 	 *            A String[] of all the beat possibilities
 	 * @param thePrecincts
 	 *            A String[] of all the precinct possibilities
+	 * @return 
 	 */
-	public static void getBeatPrecinct(String[] theBeats, String[] thePrecincts) {
+	public static String[] getBeatPrecinct(String[] theBeats, String[] thePrecincts) {
 		JPanel bpPanel = new JPanel();
 
 		JComboBox<?> prec = new JComboBox<Object>(thePrecincts);
@@ -322,6 +323,9 @@ public class Ross {
 
 		JOptionPane.showConfirmDialog(null, bpPanel, "Please choose a precinct and a beat within it:",
 				JOptionPane.DEFAULT_OPTION);
+		
+		String[] bpChoice = {"prec","be"};
+		return bpChoice;
 	}
 
 	/**
