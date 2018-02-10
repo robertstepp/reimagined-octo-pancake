@@ -90,7 +90,7 @@ public class debug {
 		// done testing
 		int j = 0;
 		for (String[] innie : outtie) {
-			if ((j < 10) || (j > outtie.size() - 10))
+			if ((j < 3) || (j > outtie.size() - 4))
 				printArray(innie, " \t ");
 			++j;
 		}
