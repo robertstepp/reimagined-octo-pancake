@@ -243,7 +243,7 @@ public class Ross {
 							+ dateLims.get(0).format(formatter) + " to " + dateLims.get(1).format(formatter) + ")",
 					JOptionPane.DEFAULT_OPTION);
 
-			// Next two conditionals ensure that neither entry is blank and each
+			// Two nested conditions ensure that neither entry is blank and each
 			// contains "/". This is hardcoded and it would be better to handle
 			// the exception.
 			if (!((beginChoice.getText().equals("")) || (endChoice.getText().equals("")))) {
@@ -254,6 +254,11 @@ public class Ross {
 							|| (beginDate.isAfter(endDate)))) 
 						validRange = true;
 				}
+			} else {
+				// If no entry, assume whole range is desired
+				beginDate=dateLims.get(0);
+				endDate=dateLims.get(1);
+				validRange=true;
 			}
 		}
 	}
