@@ -210,20 +210,16 @@ public class Ross {
 	 * @param precOpts
 	 *            String ArrayList of precinct options
 	 */
-	public static LocalDate[] getChoices(String dateForm,
-			LocalDate[] dateLimits,
-			String imgLoc,
-			String[] beatOpts,
-			String[] precOpts) {
-		
-		LocalDate[] dateRangeChoice = getDateRange(dateForm, dateLimits);
+	public static decisions getChoices(String dateForm, LocalDate[] dateLimits, String imgLoc, String[][] bpAssoc,
+			String[] beatOpts, String[] precOpts, String[] typeOpts) {
+
+		LocalDate[] daChoice = getDateRange(dateForm, dateLimits);
 		displayMap(imgLoc);
-		String[] bpChoice = getBeatPrecinct(beatOpts, precOpts);
+		String[] bpChoice = getBeatPrecinct(bpAssoc, beatOpts, precOpts);
+		String tyChoice = getTypeOfCrime(typeOpts);
 
-		String[] types = { "Personal", "Property" };
-		getTypeOfCrime(types);
-
-		return dateRangeChoice;
+		decisions choices = new decisions(daChoice, bpChoice, tyChoice);
+		return choices;
 	}
 
 	/**
@@ -240,8 +236,8 @@ public class Ross {
 	 */
 	public static LocalDate[] getDateRange(String dateForm, LocalDate[] dateLims) {
 		LocalDate[] datesChosen = new LocalDate[2];
-		datesChosen[0]=LocalDate.now();
-		datesChosen[1]=LocalDate.of(1900, 1, 1);
+		datesChosen[0] = LocalDate.now();
+		datesChosen[1] = LocalDate.of(1900, 1, 1);
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateForm);
 		boolean validRange = false;
@@ -251,13 +247,14 @@ public class Ross {
 			dPanel.add(new JLabel("Beginning date:"));
 			JTextField beginChoice = new JTextField(12);
 			dPanel.add(beginChoice);
-			
+
 			dPanel.add(new JLabel("Ending date:"));
 			JTextField endChoice = new JTextField(12);
 			dPanel.add(endChoice);
 
 			// TODO: Move information from titlebar to inside dialog?
-			// Each JTextField at 12 wide just barely fits informative titlebar on MY
+			// Each JTextField at 12 wide just barely fits informative titlebar
+			// on MY
 			// computer...
 			JOptionPane.showConfirmDialog(null,
 					dPanel, "Please enter date range of interest: (Strictly formatted and from "
@@ -304,27 +301,33 @@ public class Ross {
 	 * via a dialog with dropdowns. It will only accept a beat which is within
 	 * the precinct chosen.
 	 * 
+	 * @param beatsInPrecincts
+	 * 
 	 * @param theBeats
 	 *            A String[] of all the beat possibilities
 	 * @param thePrecincts
 	 *            A String[] of all the precinct possibilities
-	 * @return 
+	 * @return
 	 */
-	public static String[] getBeatPrecinct(String[] theBeats, String[] thePrecincts) {
+	public static String[] getBeatPrecinct(String[][] beatsInPrecincts, String[] theBeats, String[] thePrecincts) {
 		JPanel bpPanel = new JPanel();
 
 		JComboBox<?> prec = new JComboBox<Object>(thePrecincts);
 		bpPanel.add(new JLabel("Precinct:"));
 		bpPanel.add(prec);
+		String precChoice;
 
 		JComboBox<?> be = new JComboBox<Object>(theBeats);
 		bpPanel.add(new JLabel("Beat:"));
 		bpPanel.add(be);
+		String beatChoice;
 
 		JOptionPane.showConfirmDialog(null, bpPanel, "Please choose a precinct and a beat within it:",
 				JOptionPane.DEFAULT_OPTION);
+
 		
-		String[] bpChoice = {"prec","be"};
+		
+		String[] bpChoice = { "prec", "be" };
 		return bpChoice;
 	}
 
@@ -335,7 +338,7 @@ public class Ross {
 	 *            Array of Strings containing the general types of crimes
 	 *            available
 	 */
-	public static void getTypeOfCrime(String[] types) {
+	public static String getTypeOfCrime(String[] types) {
 		JPanel inputType = new JPanel();
 		JComboBox<?> type = new JComboBox<Object>(types);
 		inputType.add(new JLabel("Type requested:"));
@@ -344,6 +347,8 @@ public class Ross {
 		// Will aim to make all debug output run from main(), that way there's a
 		// builtin check to ensure actual data needing to be returned/passed is
 		// System.out.println(types[type.getSelectedIndex()]);
+		String typeChoice = "ichose";
+		return typeChoice;
 	}
 
 	public static String input() {
@@ -372,10 +377,11 @@ public class Ross {
 		String[] colDefs = getColDefs(filename, delimiter);
 		// structFromStream sets allDat's dateVals to the range AVAILABLE
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
-		// this RESETS allDat's dateVals to those CHOSEN by user input 
+		// this RESETS allDat's dateVals to those CHOSEN by user input
 		// (probably will end up having getChoices modify allDat itself...)
-		allDat.setDateVals(getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0), allDat.getTextVals().get(2)));
-
+		allDat.setDateVals(getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0),
+				allDat.getTextVals().get(2)));
+		
 		if (DEBUG) {
 			src.debug.printFilename(filename);
 			src.debug.printDates(allDat.getDateVals(), dateFormat);
