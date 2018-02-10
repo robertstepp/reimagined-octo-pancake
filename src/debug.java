@@ -27,7 +27,7 @@ public class debug {
 	 */
 	public static void printDates(LocalDate[] mydates, String format) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-		System.out.print("DATES PASSED (format of " + format + "): \t");
+		System.out.print("DATES PASSED (" + format + "): \t");
 		for (LocalDate date : mydates) {
 			System.out.print(date.format(formatter) + ", ");
 		}
@@ -45,7 +45,7 @@ public class debug {
 	 */
 	public static void printDates(LocalDate mydate, String format) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-		System.out.println("DATE PASSED (format of " + format + "): \t" + mydate.format(formatter));
+		System.out.println("DATE PASSED (" + format + "): \t" + mydate.format(formatter));
 	}
 
 	/**
