@@ -129,12 +129,14 @@ public class Ross {
 		ArrayList<String> beats = new ArrayList<String>();
 		ArrayList<String> sectors = new ArrayList<String>();
 		ArrayList<String> precincts = new ArrayList<String>();
-		ArrayList<LocalDate> dates = new ArrayList<LocalDate>();
+		// ArrayList<LocalDate> dates = new ArrayList<LocalDate>();
+		LocalDate[] daDates = new LocalDate[2];
+
 		// https://docs.oracle.com/javase/tutorial/datetime/iso/format.html
-		// Index 0 is earliest date
-		dates.add(LocalDate.now());
-		// Index 1 is latest date
-		dates.add(LocalDate.of(1900, 1, 1));
+		// Index 0 "is" (will be) earliest date found
+		daDates[0] = LocalDate.now();
+		// Index 1 is latest date found
+		daDates[1] = LocalDate.of(1900, 1, 1);
 		// currDate is date of current record
 		LocalDate currDate = LocalDate.of(1901, 1, 1);
 
@@ -167,10 +169,10 @@ public class Ross {
 				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(daFo));
 				// If the current record's date is earlier and/or later than our
 				// thus-far-seen extremes, it becomes the new extreme(s)
-				if (currDate.isBefore(dates.get(0)))
-					dates.set(0, currDate);
-				if (currDate.isAfter(dates.get(1)))
-					dates.set(1, currDate);
+				if (currDate.isBefore(daDates[0]))
+					daDates[0] = currDate;
+				if (currDate.isAfter(daDates[1]))
+					daDates[1] = currDate;
 			}
 			curLine = br.readLine();
 		}
@@ -182,25 +184,42 @@ public class Ross {
 		// and reading direction))
 		Collections.sort(beats);
 		Collections.sort(sectors);
-		ArrayList<ArrayList<String>> textVals = new ArrayList<ArrayList<String>>();
-		textVals.add(new ArrayList<String>(beats));
-		textVals.add(new ArrayList<String>(sectors));
-		textVals.add(new ArrayList<String>(precincts));
 
-		magicTuple allTheThings = new magicTuple(whichCol, textVals, dates, theRecords);
+		String[] daBeats = beats.toArray(new String[beats.size()]);
+		String[] daSectors = sectors.toArray(new String[sectors.size()]);
+		String[] daPrecincts = precincts.toArray(new String[precincts.size()]);
+
+		ArrayList<String[]> textVals = new ArrayList<String[]>();
+		textVals.add(daBeats);
+		textVals.add(daSectors);
+		textVals.add(daPrecincts);
+
+		magicTuple allTheThings = new magicTuple(whichCol, textVals, daDates, theRecords);
 		return allTheThings;
 	}
 
-	/** getChoices (via submethods) obtains from the user their choices after relevant options have been obtained from the data 
+	/**
+	 * getChoices (via submethods) obtains from the user their choices after
+	 * relevant options have been obtained from the data
 	 * 
-	 * @param dateForm The formatting String for parsing and display of dates
-	 * @param dateLimits An LocalDate ArrayList with (0) the earliest permissible date and (1) the latest permissible date
-	 * @param imgLoc Path to the image (map) to be displayed
-	 * @param beatOpts A String ArrayList of beat options
-	 * @param precOpts String ArrayList of precinct options
+	 * @param dateForm
+	 *            The formatting String for parsing and display of dates
+	 * @param dateLimits
+	 *            An LocalDate ArrayList with (0) the earliest permissible date
+	 *            and (1) the latest permissible date
+	 * @param imgLoc
+	 *            Path to the image (map) to be displayed
+	 * @param beatOpts
+	 *            A String ArrayList of beat options
+	 * @param precOpts
+	 *            String ArrayList of precinct options
 	 */
-	public static void getChoices(String dateForm, ArrayList<LocalDate> dateLimits, String imgLoc,
-			ArrayList<String> beatOpts, ArrayList<String> precOpts) {
+	public static void getChoices(String dateForm,
+			LocalDate[] dateLimits,
+			String imgLoc,
+			String[] beatOpts,
+			String[] precOpts) {
+		
 		getDateRange(dateForm, dateLimits);
 		displayMap(imgLoc);
 		getBeatPrecinct(beatOpts, precOpts);
@@ -222,7 +241,7 @@ public class Ross {
 	 *            ArrayList of LocalDate's. First element is earliest
 	 *            permissible date, second latest
 	 */
-	public static void getDateRange(String dateForm, ArrayList<LocalDate> dateLims) {
+	public static void getDateRange(String dateForm, LocalDate[] dateLims) {
 		LocalDate beginDate = LocalDate.now(), endDate = LocalDate.of(1900, 1, 1);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateForm);
 		boolean validRange = false;
@@ -238,9 +257,9 @@ public class Ross {
 			JTextField endChoice = new JTextField(12);
 			dPanel.add(endChoice);
 
-			JOptionPane.showConfirmDialog(null, dPanel,
-					"Please enter date range of interest: (Strictly formatted and from "
-							+ dateLims.get(0).format(formatter) + " to " + dateLims.get(1).format(formatter) + ")",
+			JOptionPane.showConfirmDialog(null,
+					dPanel, "Please enter date range of interest: (Strictly formatted and from "
+							+ dateLims[0].format(formatter) + " to " + dateLims[1].format(formatter) + ")",
 					JOptionPane.DEFAULT_OPTION);
 
 			// Two nested conditions ensure that neither entry is blank and each
@@ -250,15 +269,15 @@ public class Ross {
 				if ((beginChoice.getText().contains("/")) && (beginChoice.getText().contains("/"))) {
 					beginDate = LocalDate.parse(beginChoice.getText(), formatter);
 					endDate = LocalDate.parse(endChoice.getText(), formatter);
-					if (!((beginDate.isBefore(dateLims.get(0)) || (endDate.isAfter(dateLims.get(1))))
-							|| (beginDate.isAfter(endDate)))) 
+					if (!((beginDate.isBefore(dateLims[0]) || (endDate.isAfter(dateLims[1])))
+							|| (beginDate.isAfter(endDate))))
 						validRange = true;
 				}
 			} else {
 				// If no entry, assume whole range is desired
-				beginDate=dateLims.get(0);
-				endDate=dateLims.get(1);
-				validRange=true;
+				beginDate = dateLims[0];
+				endDate = dateLims[1];
+				validRange = true;
 			}
 		}
 	}
@@ -278,39 +297,36 @@ public class Ross {
 	}
 
 	/**
-	 * transitioning to other version, below
+	 * getBeatPrecinct obtains from the user their beat and precinct preferences
+	 * via a dialog with dropdowns. It will only accept a beat which is within
+	 * the precinct chosen.
 	 * 
-	 * @param precincts
-	 * @param beats
+	 * @param theBeats
+	 *            A String[] of all the beat possibilities
+	 * @param thePrecincts
+	 *            A String[] of all the precinct possibilities
 	 */
-	public static void getBeatPrecinct(String[] precincts, String[] beats) {
-		JPanel inputArea = new JPanel();
-		JComboBox<?> precinct = new JComboBox<Object>(precincts);
-		JComboBox<?> beat = new JComboBox<Object>(beats);
-		inputArea.add(new JLabel("Precinct:"));
-		inputArea.add(precinct);
-		inputArea.add(new JLabel("Beat:"));
-		inputArea.add(beat);
-		JOptionPane.showConfirmDialog(null, inputArea, "Enter requested area:", JOptionPane.OK_CANCEL_OPTION);
-		// System.out.printf("Precinct: %s Beat: %s\n",
-		// precincts[precinct.getSelectedIndex()],
-		// beats[beat.getSelectedIndex()]);
-		// System.out.println("Precinct value: " + precinct.getText());
+	public static void getBeatPrecinct(String[] theBeats, String[] thePrecincts) {
+		JPanel bpPanel = new JPanel();
+
+		JComboBox<?> prec = new JComboBox<Object>(thePrecincts);
+		bpPanel.add(new JLabel("Precinct:"));
+		bpPanel.add(prec);
+
+		JComboBox<?> be = new JComboBox<Object>(theBeats);
+		bpPanel.add(new JLabel("Beat:"));
+		bpPanel.add(be);
+
+		JOptionPane.showConfirmDialog(null, bpPanel, "Please choose a precinct and a beat within it:",
+				JOptionPane.DEFAULT_OPTION);
 	}
 
 	/**
-	 * this version is a placeholder which takes the updated param datatypes
+	 * Ask the user the type of crime they would like to focus on
 	 * 
-	 * @param theBeats
-	 * @param thePrecincts
-	 */
-	public static void getBeatPrecinct(ArrayList<String> theBeats, ArrayList<String> thePrecincts) {
-
-	}
-
-	/** Obtain from the user the type of crime they would like to focus on
-	 * 
-	 * @param types Array of Strings containing the general types of crimes available
+	 * @param types
+	 *            Array of Strings containing the general types of crimes
+	 *            available
 	 */
 	public static void getTypeOfCrime(String[] types) {
 		JPanel inputType = new JPanel();
@@ -352,14 +368,14 @@ public class Ross {
 		// Added the filename input
 		String tempFilename = "";
 		tempFilename = input();
-		if (tempFilename.length() > 0) 
+		if (tempFilename.length() > 0)
 			filename = tempFilename;
 		String[] colDefs = getColDefs(filename, delimiter);
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
 		getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0), allDat.getTextVals().get(2));
 
 		if (debug) {
-			src.debug.printDates(allDat.getDateVals(),dateFormat);
+			//src.debug.printDates(allDat.getDateVals(), dateFormat);
 			src.debug.printArray(allDat.getTextVals().get(0), ",");
 			src.debug.printArray(allDat.getTextVals().get(1), ",");
 			src.debug.printArray(allDat.getTextVals().get(2), ",");

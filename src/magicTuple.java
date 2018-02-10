@@ -7,11 +7,11 @@ import java.util.ArrayList;
 // I'd like to take this opportunity to thank Eclipse's "generate getters and setters!"  :]
 class magicTuple {
 	int[] colPos;
-	ArrayList<ArrayList<String>> textVals = new ArrayList<ArrayList<String>>();
-	ArrayList<LocalDate> dateVals = new ArrayList<LocalDate>();
+	ArrayList<String[]> textVals = new ArrayList<String[]>();
+	LocalDate[] dateVals = new LocalDate[2];
 	ArrayList<String[]> theRecs = new ArrayList<String[]>();
 
-	magicTuple(int[] colPos, ArrayList<ArrayList<String>> textVals, ArrayList<LocalDate> dateVals,
+	magicTuple(int[] colPos, ArrayList<String[]> textVals, LocalDate[] dateVals,
 			ArrayList<String[]> theRecs) {
 		this.colPos = colPos;
 		this.textVals = textVals;
@@ -29,14 +29,14 @@ class magicTuple {
 	/**
 	 * @return the textVals
 	 */
-	public ArrayList<ArrayList<String>> getTextVals() {
+	public ArrayList<String[]> getTextVals() {
 		return textVals;
 	}
 
 	/**
 	 * @return the dateVals
 	 */
-	public ArrayList<LocalDate> getDateVals() {
+	public LocalDate[] getDateVals() {
 		return dateVals;
 	}
 
@@ -59,7 +59,7 @@ class magicTuple {
 	 * @param textVals
 	 *            the textVals to set
 	 */
-	public void setTextVals(ArrayList<ArrayList<String>> textVals) {
+	public void setTextVals(ArrayList<String[]> textVals) {
 		this.textVals = textVals;
 	}
 
@@ -67,7 +67,7 @@ class magicTuple {
 	 * @param dateVals
 	 *            the dateVals to set
 	 */
-	public void setDateVals(ArrayList<LocalDate> dateVals) {
+	public void setDateVals(LocalDate[] dateVals) {
 		this.dateVals = dateVals;
 	}
 
