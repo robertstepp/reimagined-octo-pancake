@@ -303,9 +303,7 @@ public class Ross {
 			// computer...
 			JOptionPane.showConfirmDialog(null,
 					dPanel,
-					"Please enter date range of interest: (Strictly formatted and from "
-							+ dateLims[0].format(formatter) + " to "
-							+ dateLims[1].format(formatter) + ")",
+					"Please enter date range of interest:",
 					JOptionPane.DEFAULT_OPTION);
 
 			// Two nested conditions ensure that neither entry is blank and each
@@ -345,6 +343,7 @@ public class Ross {
 		// https://alvinalexander.com/blog/post/jfc-swing/how-set-jframe-size-fill-entire-screen-maximize
 		// This reservedHeight is just enough for my high-DPI 13" Macbook and
 		// will be fine for the school computers
+		// Precinct and Beat options:
 		int reservedHeight = 45, scaleNumerator = 1, scaleDenominator = 1;
 		JFrame frame = new JFrame();
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
