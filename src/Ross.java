@@ -343,13 +343,13 @@ public class Ross {
 		// https://alvinalexander.com/blog/post/jfc-swing/how-set-jframe-size-fill-entire-screen-maximize
 		// This reservedHeight is just enough for my high-DPI 13" Macbook and
 		// will be fine for the school computers
-		// Precinct and Beat options:
 		int reservedHeight = 45, scaleNumerator = 1, scaleDenominator = 1;
 		JFrame frame = new JFrame();
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		ImageIcon icon = new ImageIcon(new ImageIcon(mapLoc).getImage().getScaledInstance(-1,
 				(screenSize.height - reservedHeight) * scaleNumerator / scaleDenominator, Image.SCALE_SMOOTH));
 		frame.setSize(-1, (screenSize.height - reservedHeight) * scaleNumerator / scaleDenominator);
+		frame.setTitle("Precinct and Beat options:");
 		JLabel label = new JLabel(icon);
 		frame.add(label);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
