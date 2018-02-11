@@ -412,7 +412,7 @@ public class Ross {
 		// possibilities
 
 		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0),
-				allDat.getTextVals().get(1), crimeClasses);
+				allDat.getTextVals().get(2), crimeClasses);
 
 		if (DEBUG) {
 			System.out.println("###INITIAL###");
