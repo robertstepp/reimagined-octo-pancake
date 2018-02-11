@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 //import java.util.Date;
 //import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 //import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -210,14 +212,19 @@ public class Ross {
 	 * @param precOpts
 	 *            String ArrayList of precinct options
 	 */
-	public static decisions getChoices(String dateForm, LocalDate[] dateLimits, String imgLoc, String[][] bpAssoc,
-			String[] beatOpts, String[] precOpts, String[] typeOpts) {
+	public static decisions getChoices(String dateForm, LocalDate[] dateLimits, String imgLoc,
+			LinkedHashMap<String,String[]> bpAssoc, String[] beatOpts, String[] precOpts, String[] typeOpts) {
 
+		// Get user's chosen min/max dates
 		LocalDate[] daChoice = getDateRange(dateForm, dateLimits);
+		// Show user the beat(/sector)/precinct map to aid their areal choosings
 		displayMap(imgLoc);
+		// Get user's chosen beat and precinct
 		String[] bpChoice = getBeatPrecinct(bpAssoc, beatOpts, precOpts);
+		// Get user's crime type of focus
 		String tyChoice = getTypeOfCrime(typeOpts);
 
+		// Return the decisions/choices of all our submethods
 		decisions choices = new decisions(daChoice, bpChoice, tyChoice);
 		return choices;
 	}
@@ -301,7 +308,7 @@ public class Ross {
 	 * via a dialog with dropdowns. It will only accept a beat which is within
 	 * the precinct chosen.
 	 * 
-	 * @param beatsInPrecincts
+	 * @param bpAssoc
 	 * 
 	 * @param theBeats
 	 *            A String[] of all the beat possibilities
@@ -309,7 +316,7 @@ public class Ross {
 	 *            A String[] of all the precinct possibilities
 	 * @return
 	 */
-	public static String[] getBeatPrecinct(String[][] beatsInPrecincts, String[] theBeats, String[] thePrecincts) {
+	public static String[] getBeatPrecinct(LinkedHashMap<String, String[]> bpAssoc, String[] theBeats, String[] thePrecincts) {
 		JPanel bpPanel = new JPanel();
 
 		JComboBox<?> prec = new JComboBox<Object>(thePrecincts);
@@ -361,22 +368,41 @@ public class Ross {
 	}
 
 	public static void main(String[] args) throws IOException {
+		// Defaults/constants/hardcodes
 		String filename = "datasets/original raw data-DON'T MODIFY.csv";
 		String mapLoc = "src/beat-map-2.png";
 		String delimiter = ",";
 		String dateFormat = "MM/dd/yyyy";
+		String[] crimeClasses = {"Personal","Property"};
 		final boolean DEBUG = true;
 
-		// Added the filename input
+		// Obtain from user which file has the records, which will provide our
+		// data and the parameters of our options
 		String tempFilename = "";
 		tempFilename = input();
 		if (tempFilename.length() > 0)
 			filename = tempFilename;
+
+		// Obtain from the file our categories
 		String[] colDefs = getColDefs(filename, delimiter);
-		// structFromStream sets allDat's dateVals to the range AVAILABLE
+		// Now that we know our header, we can parse our file into structured
+		// data
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
-		decisions thCh = new decisions(null, colDefs, tempFilename);
-		getChoices(dateFormat, allDat.dateVals, mapLoc, allDat.textVals[0]);
+		// With our structured data, we can ask the user their choice among the possibilities
+	
+		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
+		String[] nw = { "n1", "n2", "n3" };
+		String[] sw = { "s1", "s2", "s3", "q5", "q7", "q9" };
+		String[] yom = { "b", "a", "d", " ", "a", "s", "s" };
+		String[] aa = { "berf" };
+		pb.put("yom", yom);
+		pb.put("aa", aa);
+		pb.put("nw", nw);
+		pb.put("sw", sw);
+
+		
+		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc,
+				pb, allDat.getTextVals().get(0), allDat.getTextVals().get(1), crimeClasses);
 
 		if (DEBUG) {
 			src.debug.printFilename(filename);

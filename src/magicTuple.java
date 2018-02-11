@@ -7,13 +7,13 @@ import java.util.ArrayList;
 // I'd like to take this opportunity to thank Eclipse's "generate getters and setters!"  :]
 class magicTuple {
 	int[] colPos;
+	// first String[] is beats opts, second is prec opts
 	ArrayList<String[]> textVals = new ArrayList<String[]>();
-// the extremes of dates represented in the records
+	// the extremes of dates represented in the records
 	LocalDate[] dateVals = new LocalDate[2];
 	ArrayList<String[]> theRecs = new ArrayList<String[]>();
 
-	magicTuple(int[] colPos, ArrayList<String[]> textVals, LocalDate[] dateVals,
-			ArrayList<String[]> theRecs) {
+	magicTuple(int[] colPos, ArrayList<String[]> textVals, LocalDate[] dateVals, ArrayList<String[]> theRecs) {
 		this.colPos = colPos;
 		this.textVals = textVals;
 		this.dateVals = dateVals;
