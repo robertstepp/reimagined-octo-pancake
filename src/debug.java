@@ -98,7 +98,7 @@ public class debug {
 		System.out.println("SOME OF ARRAYLIST<STRING[]> PASSED:");
 		for (String[] innie : outtie) {
 			//if ((j < 3) || (j > outtie.size() - 4))
-				printArray(innie, " \t ");
+				printArray(innie, delim);
 			++j;
 		}
 	}

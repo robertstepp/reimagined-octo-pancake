@@ -1,9 +1,6 @@
 package src;
-
 import java.awt.Image;
-//import java.awt.List;
 import java.io.BufferedReader;
-//import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -11,14 +8,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-//import java.util.Arrays;
 import java.util.Collections;
-//import java.util.Date;
-//import java.util.List;
 import java.util.LinkedHashMap;
-//import java.util.Map;
-
-//import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -208,6 +199,9 @@ public class Ross {
 		int precCol = allDat.colPos[2];
 		int beatCol = allDat.colPos[0];
 
+		String precReq = thCh.bpCh[0];
+		String beatReq = thCh.bpCh[1];
+
 		// LocalDate recDate = new LocalDate.now();
 		String recPrec, recBeat;
 
@@ -215,13 +209,12 @@ public class Ross {
 			LocalDate recDate = LocalDate.parse(aRecord[dateCol], DateTimeFormatter.ofPattern(dateForm));
 			recPrec = aRecord[precCol];
 			recBeat = aRecord[beatCol];
-			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate)))) {
-				if (!(recDate.isAfter(maxDate))) {
-					if (!(recDate.isBefore(minDate))) {
-						recSel.add(aRecord);
-					}
-				}
-			}
+			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate))))
+				if (!(recDate.isAfter(maxDate)))
+					if (!(recDate.isBefore(minDate)))
+						if (recPrec.equals(precReq))
+							if (recBeat.equals(beatReq))
+								recSel.add(aRecord);
 		}
 		return recSel;
 	}
@@ -460,7 +453,7 @@ public class Ross {
 			System.out.println();
 			src.debug.printArray(colDefs, " \t ");
 			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-			src.debug.printArray(allDat.getTheRecs(), " \t ", true);
+			// src.debug.printArray(allDat.getTheRecs(), " \t ", true);
 
 			System.out.println();
 			System.out.println("###EFFECTIVE###");
@@ -469,10 +462,10 @@ public class Ross {
 			System.out.println();
 			System.out.println("###CHOSEN###");
 			src.debug.printDates(thCh.getDaCh(), dateFormat);
-			src.debug.printArray(thCh.bpCh, ", ");
+			// src.debug.printArray(thCh.bpCh, ", ");
 			System.out.println("TYPE CHOSEN: " + thCh.tyCh);
 
-			src.debug.printArray(selRec, "~", true);
+			src.debug.printArray(selRec, "\t", true);
 		}
 	}
 }
