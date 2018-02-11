@@ -33,7 +33,8 @@ public class Ross {
 	 *         the default
 	 */
 	public static String input(String filename) {
-		JTextField preFilename = new JTextField(10);
+		JTextField preFilename = new JTextField();
+		preFilename.setText(filename);
 		JPanel inputFilename = new JPanel();
 		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
 		inputFilename.add(preFilename);
