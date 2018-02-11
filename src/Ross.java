@@ -1,7 +1,9 @@
 // Java Program by Ross Hemphill & Robert Stepp 02/11/2018
 package src;
 
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -340,10 +342,15 @@ public class Ross {
 	 * Displays the Beat Map resized down.
 	 **/
 	public static void displayMap(String mapLoc) {
+		// https://alvinalexander.com/blog/post/jfc-swing/how-set-jframe-size-fill-entire-screen-maximize
+		// This reservedHeight is just enough for my high-DPI 13" Macbook and
+		// will be fine for the school computers
+		int reservedHeight = 45, scaleNumerator = 1, scaleDenominator = 1;
 		JFrame frame = new JFrame();
-		ImageIcon icon = new ImageIcon(
-				new ImageIcon(mapLoc).getImage().getScaledInstance(-1, 1000,
-						Image.SCALE_SMOOTH));
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		ImageIcon icon = new ImageIcon(new ImageIcon(mapLoc).getImage().getScaledInstance(-1,
+				(screenSize.height - reservedHeight) * scaleNumerator / scaleDenominator, Image.SCALE_SMOOTH));
+		frame.setSize(-1, (screenSize.height - reservedHeight) * scaleNumerator / scaleDenominator);
 		JLabel label = new JLabel(icon);
 		frame.add(label);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
