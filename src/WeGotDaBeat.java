@@ -40,8 +40,7 @@ public class WeGotDaBeat {
 		JPanel inputFilename = new JPanel();
 		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
 		inputFilename.add(preFilename);
-		JOptionPane.showConfirmDialog(null, inputFilename,
-				"Please Enter Filename:", JOptionPane.DEFAULT_OPTION);
+		JOptionPane.showConfirmDialog(null, inputFilename, "Please Enter Filename:", JOptionPane.DEFAULT_OPTION);
 		String tempFilename = preFilename.getText();
 		if (tempFilename.length() > 0)
 			filename = tempFilename;
@@ -70,8 +69,7 @@ public class WeGotDaBeat {
 	 * @return An ArrayList of Objects, each of which are super-fun themselves
 	 * @throws IOException
 	 */
-	public static magicTuple structFromStream(String file, String del,
-			String daFo, String[] cols) throws IOException {
+	public static magicTuple structFromStream(String file, String del, String daFo, String[] cols) throws IOException {
 		// The columnar positions of the fields we're recording possible values
 		// for
 		// Index [0=beat, 1=sector, 2=precinct, 3=date]
@@ -131,8 +129,7 @@ public class WeGotDaBeat {
 				if (!(precincts.contains(splitLine[whichCol[2]])))
 					precincts.add(splitLine[whichCol[2]]);
 				// Turn our date string into a LocalDate
-				currDate = LocalDate.parse(splitLine[whichCol[3]],
-						DateTimeFormatter.ofPattern(daFo));
+				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(daFo));
 				// If the current record's date is earlier and/or later than our
 				// thus-far-seen extremes, it becomes the new extreme(s)
 				if (currDate.isBefore(daDates[0]))
@@ -158,8 +155,7 @@ public class WeGotDaBeat {
 		textVals.add(daSectors);
 		textVals.add(daPrecincts);
 
-		magicTuple allTheThings = new magicTuple(whichCol, textVals, daDates,
-				theRecords);
+		magicTuple allTheThings = new magicTuple(whichCol, textVals, daDates, theRecords);
 		return allTheThings;
 	}
 
@@ -174,8 +170,7 @@ public class WeGotDaBeat {
 	 * @return A String ArrayList containing the column headings
 	 * @throws IOException
 	 */
-	public static String[] getColDefs(String file, String delim)
-			throws IOException {
+	public static String[] getColDefs(String file, String delim) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		// ArrayList<String> cols = new
 		// ArrayList<>(Arrays.asList(br.readLine().split(delim)));
@@ -194,8 +189,7 @@ public class WeGotDaBeat {
 	 * @throws IOException
 	 */
 	public static int numberOfRows(String file) throws IOException {
-		LineNumberReader lineReader = new LineNumberReader(
-				new FileReader(file));
+		LineNumberReader lineReader = new LineNumberReader(new FileReader(file));
 		lineReader.skip(Long.MAX_VALUE);
 		int numRows = lineReader.getLineNumber();
 		lineReader.close();
@@ -241,10 +235,8 @@ public class WeGotDaBeat {
 	 * @param precOpts
 	 *            String ArrayList of precinct options
 	 */
-	public static decisions getChoices(String dateForm, LocalDate[] dateLimits,
-			String imgLoc,
-			LinkedHashMap<String, String[]> bpAssoc, String[] beatOpts,
-			String[] precOpts, String[] typeOpts) {
+	public static decisions getChoices(String dateForm, LocalDate[] dateLimits, String imgLoc,
+			LinkedHashMap<String, String[]> bpAssoc, String[] beatOpts, String[] precOpts, String[] typeOpts) {
 		// Get user's chosen min/max dates
 		LocalDate[] daChoice = getDateRange(dateForm, dateLimits);
 		// Show user the beat(/sector)/precinct map to aid their areal choosings
@@ -271,8 +263,7 @@ public class WeGotDaBeat {
 	 *            ArrayList of LocalDate's. First element is earliest
 	 *            permissible date, second latest
 	 */
-	public static LocalDate[] getDateRange(String dateForm,
-			LocalDate[] dateLims) {
+	public static LocalDate[] getDateRange(String dateForm, LocalDate[] dateLims) {
 		LocalDate[] datesChosen = new LocalDate[2];
 		datesChosen[0] = LocalDate.now();
 		datesChosen[1] = LocalDate.of(1900, 1, 1);
@@ -282,8 +273,7 @@ public class WeGotDaBeat {
 		boolean dateFail = false;
 		while (!validRange) {
 			if (dateFail == true) {
-				JOptionPane.showConfirmDialog(null,
-						"Incorrect Date Range.\nPlease ensure correct date range entered.",
+				JOptionPane.showConfirmDialog(null, "Incorrect Date Range.\nPlease ensure correct date range entered.",
 						"Error", JOptionPane.DEFAULT_OPTION);
 			}
 			JPanel dPanel = new JPanel();
@@ -297,26 +287,19 @@ public class WeGotDaBeat {
 			endChoice.setText(dateLims[1].format(formatter));
 			dPanel.add(endChoice);
 
-			JOptionPane.showConfirmDialog(null,
-					dPanel,
-					"Please enter date range of interest:",
+			JOptionPane.showConfirmDialog(null, dPanel, "Please enter date range of interest:",
 					JOptionPane.DEFAULT_OPTION);
 
 			// Two nested conditions ensure that neither entry is blank and each
 			// contains "/". This is hardcoded and it would be better to handle
 			// the exception. (B/C infinite other unparseable input possible)
-			if (!((beginChoice.getText().equals(""))
-					|| (endChoice.getText().equals("")))) {
+			if (!((beginChoice.getText().equals("")) || (endChoice.getText().equals("")))) {
 				// if ((beginChoice.getText().contains("/")) &&
 				// (beginChoice.getText().contains("/"))) {
-				if ((beginChoice.getText().contains("/"))
-						&& (endChoice.getText().contains("/"))) {
-					datesChosen[0] = LocalDate.parse(beginChoice.getText(),
-							formatter);
-					datesChosen[1] = LocalDate.parse(endChoice.getText(),
-							formatter);
-					if (!((datesChosen[0].isBefore(dateLims[0])
-							|| (datesChosen[1].isAfter(dateLims[1])))
+				if ((beginChoice.getText().contains("/")) && (endChoice.getText().contains("/"))) {
+					datesChosen[0] = LocalDate.parse(beginChoice.getText(), formatter);
+					datesChosen[1] = LocalDate.parse(endChoice.getText(), formatter);
+					if (!((datesChosen[0].isBefore(dateLims[0]) || (datesChosen[1].isAfter(dateLims[1])))
 							|| (datesChosen[0].isAfter(datesChosen[1]))))
 						validRange = true;
 				}
@@ -366,8 +349,7 @@ public class WeGotDaBeat {
 	 *            A String[] of all the precinct possibilities
 	 * @return
 	 */
-	public static String[] getBeatPrecinct(
-			LinkedHashMap<String, String[]> bpAssoc, String[] theBeats,
+	public static String[] getBeatPrecinct(LinkedHashMap<String, String[]> bpAssoc, String[] theBeats,
 			String[] thePrecincts) {
 		boolean theWorldIsGood = false;
 		String bc = "", pc = "";
@@ -382,8 +364,7 @@ public class WeGotDaBeat {
 			bpPanel.add(new JLabel("Beat:"));
 			bpPanel.add(be);
 
-			JOptionPane.showConfirmDialog(null, bpPanel,
-					"Please choose a precinct and a beat within it:",
+			JOptionPane.showConfirmDialog(null, bpPanel, "Please choose a precinct and a beat within it:",
 					JOptionPane.DEFAULT_OPTION);
 
 			bc = theBeats[be.getSelectedIndex()];
@@ -407,8 +388,7 @@ public class WeGotDaBeat {
 		JComboBox<?> type = new JComboBox<Object>(types);
 		tPanel.add(new JLabel("Type requested:"));
 		tPanel.add(type);
-		JOptionPane.showConfirmDialog(null, tPanel, "Enter requested type:",
-				JOptionPane.OK_CANCEL_OPTION);
+		JOptionPane.showConfirmDialog(null, tPanel, "Enter requested type:", JOptionPane.OK_CANCEL_OPTION);
 		return types[type.getSelectedIndex()];
 	}
 
@@ -429,11 +409,9 @@ public class WeGotDaBeat {
 	 * @return A selecARec consisting of two sets of records as
 	 *         ArrayList-String[]'s
 	 */
-	private static selecARec cullRecords(magicTuple allDat, decisions thCh,
-			String dateForm,
+	private static selecARec cullRecords(magicTuple allDat, decisions thCh, String dateForm,
 			LinkedHashMap<String, String[]> crimeCateg) {
-		int dateCol = allDat.colPos[3], precCol = allDat.colPos[2],
-				beatCol = allDat.colPos[0];
+		int dateCol = allDat.colPos[3], precCol = allDat.colPos[2], beatCol = allDat.colPos[0];
 		LocalDate minDate = thCh.daCh[0], maxDate = thCh.daCh[1];
 		String precReq = thCh.bpCh[0], beatReq = thCh.bpCh[1];
 
@@ -441,13 +419,11 @@ public class WeGotDaBeat {
 		ArrayList<String[]> precRecs = new ArrayList<String[]>();
 
 		for (String[] aRecord : allDat.theRecs) {
-			LocalDate recDate = LocalDate.parse(aRecord[dateCol],
-					DateTimeFormatter.ofPattern(dateForm));
+			LocalDate recDate = LocalDate.parse(aRecord[dateCol], DateTimeFormatter.ofPattern(dateForm));
 			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate))))
 				// Danger Will Robinson, hardcoded column position for
 				// CRIME_TYPE! (aRecord[1])
-				if (Arrays.asList(crimeCateg.get(thCh.tyCh))
-						.contains(aRecord[1]))
+				if (Arrays.asList(crimeCateg.get(thCh.tyCh)).contains(aRecord[1]))
 					if (aRecord[precCol].equals(precReq)) {
 						precRecs.add(aRecord);
 						if (aRecord[beatCol].equals(beatReq))
@@ -468,11 +444,9 @@ public class WeGotDaBeat {
 		String dateFormat = "M/d/yyyy";
 		// Beats are within precincts (we're ignoring sectors)
 		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
-		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3",
-				"N1", "N2", "N3", "U1", "U2", "U3" };
+		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3", "N1", "N2", "N3", "U1", "U2", "U3" };
 		pb.put("N", n);
-		String[] w = { "D1", "D2", "D3", "K1", "K2", "K3", "M1", "M2", "M3",
-				"Q1", "Q2", "Q3" };
+		String[] w = { "D1", "D2", "D3", "K1", "K2", "K3", "M1", "M2", "M3", "Q1", "Q2", "Q3" };
 		pb.put("W", w);
 		String[] e = { "C1", "C2", "C3", "E1", "E2", "E3", "G1", "G2", "G3" };
 		pb.put("E", e);
@@ -483,11 +457,9 @@ public class WeGotDaBeat {
 		// Two general classes of crime
 		LinkedHashMap<String, String[]> cc = new LinkedHashMap<String, String[]>();
 		String[] crimeClasses = { "Person", "Property" };
-		String[] persCrim = { "Homicide", "Rape", "Robbery",
-				"Assault" };
+		String[] persCrim = { "Homicide", "Rape", "Robbery", "Assault" };
 		cc.put(crimeClasses[0], persCrim);
-		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft",
-				"Motor Vehicle Theft" };
+		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft" };
 		cc.put(crimeClasses[1], propCrim);
 		////
 		final boolean DEBUG = true;
@@ -500,12 +472,10 @@ public class WeGotDaBeat {
 		String[] colDefs = getColDefs(filename, delimiter);
 		// Now that we know our header, we can parse our file into structured
 		// data
-		magicTuple allDat = structFromStream(filename, delimiter, dateFormat,
-				colDefs);
+		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
 		// With our structured data, we can ask the user their choice among the
 		// possibilities
-		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb,
-				allDat.getTextVals().get(0),
+		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0),
 				allDat.getTextVals().get(2), crimeClasses);
 		// Choices made, we can now cull our records
 		selecARec chosenOness = cullRecords(allDat, thCh, dateFormat, cc);
@@ -519,8 +489,7 @@ public class WeGotDaBeat {
 			src.debug.printArray(allDat.getTextVals().get(2), ",");
 			System.out.println();
 			src.debug.printArray(colDefs, " \t ");
-			System.out.println(
-					"=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			// src.debug.printArray(allDat.getTheRecs(), " \t ", true);
 			System.out.println();
 			System.out.println("###EFFECTIVE###");
