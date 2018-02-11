@@ -462,8 +462,8 @@ public class WeGotDaBeat {
 	///////
 	public static void main(String[] args) throws IOException {
 		// Defaults/constants/hardcodes
-		String filename = "datasets/original raw data-DON'T MODIFY.csv";
-		String mapLoc = "src/beat-map-2.png";
+		String filename = "not-src/Seattle_Crime_Stats_by_Police_Precinct_2008-Present.csv";
+		String mapLoc = "not-src/beat-map-2.png";
 		String delimiter = ",";
 		String dateFormat = "M/d/yyyy";
 		// Beats are within precincts (we're ignoring sectors)
