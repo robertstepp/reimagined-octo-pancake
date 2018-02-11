@@ -37,7 +37,7 @@ public class Ross {
 		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
 		inputFilename.add(preFilename);
 		JOptionPane.showConfirmDialog(null, inputFilename,
-				"Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
+				"Please Enter Filename:", JOptionPane.DEFAULT_OPTION);
 		String tempFilename = preFilename.getText();
 		if (tempFilename.length() > 0)
 			filename = tempFilename;
