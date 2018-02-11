@@ -469,7 +469,7 @@ public class Ross {
 		String filename = "datasets/original raw data-DON'T MODIFY.csv";
 		String mapLoc = "src/beat-map-2.png";
 		String delimiter = ",";
-		String dateFormat = "MM/dd/yyyy";
+		String dateFormat = "M/d/yyyy";
 		// Beats are within precincts (we're ignoring sectors)
 		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
 		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3",
