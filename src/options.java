@@ -4,6 +4,11 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/** I'm currently confusing myself with "How did I create this and then not use it?!" TODO: Is this trash, self?
+ * 
+ * @author Ross
+ *
+ */
 public class options {
 	LocalDate[] daRn;
 	String[] beOp;
