@@ -1,4 +1,5 @@
 package src;
+
 import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Ross {
-/////// 1st stage
+	/////// 1st stage
 	/**
 	 * First interaction with the user. Asks for filepath and uses default
 	 * passed to it if their entry is blank
@@ -331,29 +332,29 @@ public class Ross {
 	 */
 	public static String[] getBeatPrecinct(LinkedHashMap<String, String[]> bpAssoc, String[] theBeats,
 			String[] thePrecincts) {
-		JPanel bpPanel = new JPanel();
+		boolean theWorldIsGood = false;
+		String bc = "", pc = "";
+		while (!theWorldIsGood) {
+			JPanel bpPanel = new JPanel();
 
-		JComboBox<?> prec = new JComboBox<Object>(thePrecincts);
-		bpPanel.add(new JLabel("Precinct:"));
-		bpPanel.add(prec);
+			JComboBox<?> prec = new JComboBox<Object>(thePrecincts);
+			bpPanel.add(new JLabel("Precinct:"));
+			bpPanel.add(prec);
 
-		JComboBox<?> be = new JComboBox<Object>(theBeats);
-		bpPanel.add(new JLabel("Beat:"));
-		bpPanel.add(be);
+			JComboBox<?> be = new JComboBox<Object>(theBeats);
+			bpPanel.add(new JLabel("Beat:"));
+			bpPanel.add(be);
 
-		JOptionPane.showConfirmDialog(null, bpPanel, "Please choose a precinct and a beat within it:",
-				JOptionPane.DEFAULT_OPTION);
+			JOptionPane.showConfirmDialog(null, bpPanel, "Please choose a precinct and a beat within it:",
+					JOptionPane.DEFAULT_OPTION);
 
-		String bc = theBeats[be.getSelectedIndex()];
-		String pc = thePrecincts[prec.getSelectedIndex()];
-		String[] bpChoice = { pc, bc };
-		// TODO: THIS WILL BE FIXED ASAP!! :)
-		if (Arrays.asList(bpAssoc.get(pc)).contains(bc)) {
-			System.out.println("WINNNNNN");
-		} else {
-			System.out.println("BRAINSSSSS");
+			bc = theBeats[be.getSelectedIndex()];
+			pc = thePrecincts[prec.getSelectedIndex()];
+			// TODO: THIS WILL BE FIXED ASAP!! ;)
+			if (Arrays.asList(bpAssoc.get(pc)).contains(bc))
+				theWorldIsGood = true;
 		}
-
+		String[] bpChoice = { pc, bc };
 		return bpChoice;
 	}
 
@@ -390,7 +391,8 @@ public class Ross {
 	 * @return A selecARec consisting of two sets of records as
 	 *         ArrayList-String[]'s
 	 */
-	private static selecARec cullRecords(magicTuple allDat, decisions thCh, String dateForm) {
+	private static selecARec cullRecords(magicTuple allDat, decisions thCh, String dateForm,
+			LinkedHashMap<String, String[]> crimeCateg) {
 		int dateCol = allDat.colPos[3], precCol = allDat.colPos[2], beatCol = allDat.colPos[0];
 		LocalDate minDate = thCh.daCh[0], maxDate = thCh.daCh[1];
 		String precReq = thCh.bpCh[0], beatReq = thCh.bpCh[1];
@@ -398,20 +400,26 @@ public class Ross {
 		ArrayList<String[]> beatRecs = new ArrayList<String[]>();
 		ArrayList<String[]> precRecs = new ArrayList<String[]>();
 
+		String ct = "";
 		for (String[] aRecord : allDat.theRecs) {
 			LocalDate recDate = LocalDate.parse(aRecord[dateCol], DateTimeFormatter.ofPattern(dateForm));
-			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate))))
-				if (aRecord[precCol].equals(precReq)) {
-					precRecs.add(aRecord);
-					if (aRecord[beatCol].equals(beatReq))
-						beatRecs.add(aRecord);
-				}
+			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate)))) {
+				ct = aRecord[1]; // Danger Will Robinson, hardcoded column
+									// position for CRIME_TYPE!
+				if (Arrays.asList(crimeCateg.get(thCh.tyCh)).contains(ct))
+					if (aRecord[precCol].equals(precReq)) {
+						precRecs.add(aRecord);
+						if (aRecord[beatCol].equals(beatReq))
+							beatRecs.add(aRecord);
+					}
+			}
 		}
 		selecARec recBag = new selecARec(beatRecs, precRecs);
 		return recBag;
 	}
-///////
-///////
+
+	///////
+	///////
 	public static void main(String[] args) throws IOException {
 		// Defaults/constants/hardcodes
 		String filename = "datasets/original raw data-DON'T MODIFY.csv";
@@ -434,19 +442,21 @@ public class Ross {
 		pb.put("SW", sw);
 		// Same structure for classes of crime as far precinct
 		// membership
+		LinkedHashMap<String, String[]> cc = new LinkedHashMap<String, String[]>();
 		String[] crimeClasses = { "Person", "Property" };
-		// TODO: ? LinkedHashMap<String, String[]> pp = new LinkedHashMap<String, String[]>();
-		String[] persCrim = { "Homicide", "Rape", "Robbery", "Aggravated Assault" };
-		pb.put(crimeClasses[0], persCrim);
-		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft", "Burglary" };
-		pb.put(crimeClasses[1], propCrim);
+		String[] persCrim = { "Homicide", "Rape", "Robbery", "Aggravated Assault" }; // TODO: Is aggr. assault showing up properly?
+		cc.put(crimeClasses[0], persCrim);
+		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft", "Burglary" }; // TODO: Is arson showing up?
+		cc.put(crimeClasses[1], propCrim);
+		////
 		final boolean DEBUG = true;
+		////
 
 		// BEGIN user interaction
 		// Obtain from user which file has the records (which will provide our
 		// data and the parameters of our options)
 		filename = input(filename);
-		String[] colDefs=getColDefs(filename,delimiter);
+		String[] colDefs = getColDefs(filename, delimiter);
 		// Now that we know our header, we can parse our file into structured
 		// data
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
@@ -455,7 +465,7 @@ public class Ross {
 		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0),
 				allDat.getTextVals().get(2), crimeClasses);
 		// Choices made, we can now cull our records
-		selecARec chosenOness = cullRecords(allDat, thCh, dateFormat);
+		selecARec chosenOness = cullRecords(allDat, thCh, dateFormat, cc);
 		// END user interaction
 
 		if (DEBUG) {
@@ -473,11 +483,11 @@ public class Ross {
 			src.debug.printFilename(filename);
 			System.out.println();
 			System.out.println("###CHOSEN###");
-			src.debug.printDates(thCh.getDaCh(), dateFormat);
+		 	src.debug.printDates(thCh.getDaCh(), dateFormat);
 			// src.debug.printArray(thCh.bpCh, ", ");
 			System.out.println("TYPE CHOSEN: " + thCh.tyCh);
 			src.debug.printArray(chosenOness.beatRecs, "\t", true);
-			src.debug.printArray(chosenOness.precRecs, "\t", true);
+	//		src.debug.printArray(chosenOness.precRecs, "\t", true);
 		}
 	}
 }

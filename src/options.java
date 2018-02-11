@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** I'm currently confusing myself with "How did I create this and then not use it?!" TODO: Is this trash, self?
+/**
+ * I'm currently confusing myself with "How did I create this and then not use
+ * it?!" TODO: Is this trash, self? Testing for use for the crime classes?
  * 
  * @author Ross
  *
@@ -13,11 +15,10 @@ public class options {
 	LocalDate[] daRn;
 	String[] beOp;
 	String[] prOp;
-	Map<String,String[]> bpAs = new LinkedHashMap<String,String[]>();
+	Map<String, String[]> bpAs = new LinkedHashMap<String, String[]>();
 	String[] tyOp;
-	
-	options(LocalDate[] daRn, String[] beOp, String[] prOp,
-			LinkedHashMap<String,String[]> bpAs, String[] tyOp) {
+
+	options(LocalDate[] daRn, String[] beOp, String[] prOp, LinkedHashMap<String, String[]> bpAs, String[] tyOp) {
 		this.daRn = daRn;
 		this.beOp = beOp;
 		this.prOp = prOp;
@@ -61,35 +62,40 @@ public class options {
 	}
 
 	/**
-	 * @param daRn the daRn to set
+	 * @param daRn
+	 *            the daRn to set
 	 */
 	public void setDaRn(LocalDate[] daRn) {
 		this.daRn = daRn;
 	}
 
 	/**
-	 * @param beOp the beOp to set
+	 * @param beOp
+	 *            the beOp to set
 	 */
 	public void setBeOp(String[] beOp) {
 		this.beOp = beOp;
 	}
 
 	/**
-	 * @param prOp the prOp to set
+	 * @param prOp
+	 *            the prOp to set
 	 */
 	public void setPrOp(String[] prOp) {
 		this.prOp = prOp;
 	}
 
 	/**
-	 * @param bpAs the bpAs to set
+	 * @param bpAs
+	 *            the bpAs to set
 	 */
 	public void setBpAs(Map<String, String[]> bpAs) {
 		this.bpAs = bpAs;
 	}
 
 	/**
-	 * @param tyOp the tyOp to set
+	 * @param tyOp
+	 *            the tyOp to set
 	 */
 	public void setTyOp(String[] tyOp) {
 		this.tyOp = tyOp;
