@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class Ross {
+public class WeGotDaBeat {
 	/////// 1st stage
 	/**
 	 * First interaction with the user. Asks for filepath and uses default
