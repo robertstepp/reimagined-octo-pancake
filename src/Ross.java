@@ -286,11 +286,13 @@ public class Ross {
 			}
 			JPanel dPanel = new JPanel();
 			dPanel.add(new JLabel("Beginning date:"));
-			JTextField beginChoice = new JTextField(12);
+			JTextField beginChoice = new JTextField();
+			beginChoice.setText(dateLims[0].format(formatter));
 			dPanel.add(beginChoice);
 
 			dPanel.add(new JLabel("Ending date:"));
-			JTextField endChoice = new JTextField(12);
+			JTextField endChoice = new JTextField();
+			endChoice.setText(dateLims[1].format(formatter));
 			dPanel.add(endChoice);
 
 			// TODO: Move information from titlebar to inside dialog?
