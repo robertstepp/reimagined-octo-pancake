@@ -1,0 +1,4 @@
+https://data.seattle.gov/api/views/3xqu-vnum/rows.csv?accessType=DOWNLOAD&bom=true&format=true
+
+(Linked from https://data.seattle.gov/Public-Safety/Seattle-Crime-Stats-by-Police-Precinct-2008-Presen/3xqu-vnum )
+(Exported as "CSV for Excel")

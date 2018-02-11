@@ -1,0 +1,21 @@
+Decide things
+	Weighted significances, whatever
+
+Provide output
+	Tell user our conclusion(s)
+	Provide option to loop back and get some different info?	
+
+/////////
+
+Data columns
+	4
+		STAT_VALUE
+		Integer number of occurrences, including NEGATIVES
+	6
+		Sector
+		Project Know provides names for each, but boundaries different than SPD beat map
+		https://www.projectknow.com/discover/arrests-across-america-dui/
+	7
+		Precinct
+		South(east)
+		
