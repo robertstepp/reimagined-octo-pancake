@@ -197,6 +197,35 @@ public class Ross {
 		return allTheThings;
 	}
 
+	private static ArrayList<String[]> cullRecords(magicTuple allDat, decisions thCh, String dateForm) {
+		// TODO Auto-generated method stub
+		ArrayList<String[]> recSel = new ArrayList<String[]>();
+
+		LocalDate minDate = thCh.daCh[0];
+		LocalDate maxDate = thCh.daCh[1];
+
+		int dateCol = allDat.colPos[3];
+		int precCol = allDat.colPos[2];
+		int beatCol = allDat.colPos[0];
+
+		// LocalDate recDate = new LocalDate.now();
+		String recPrec, recBeat;
+
+		for (String[] aRecord : allDat.theRecs) {
+			LocalDate recDate = LocalDate.parse(aRecord[dateCol], DateTimeFormatter.ofPattern(dateForm));
+			recPrec = aRecord[precCol];
+			recBeat = aRecord[beatCol];
+			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate)))) {
+				if (!(recDate.isAfter(maxDate))) {
+					if (!(recDate.isBefore(minDate))) {
+						recSel.add(aRecord);
+					}
+				}
+			}
+		}
+		return recSel;
+	}
+
 	/**
 	 * getChoices (via submethods) obtains from the user their choices after
 	 * relevant options have been obtained from the data
@@ -419,6 +448,8 @@ public class Ross {
 		// possibilities
 		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0),
 				allDat.getTextVals().get(2), crimeClasses);
+		// Choices made, we can now cull our records
+		ArrayList<String[]> selRec = cullRecords(allDat, thCh, dateFormat);
 
 		if (DEBUG) {
 			System.out.println("###INITIAL###");
@@ -440,6 +471,8 @@ public class Ross {
 			src.debug.printDates(thCh.getDaCh(), dateFormat);
 			src.debug.printArray(thCh.bpCh, ", ");
 			System.out.println("TYPE CHOSEN: " + thCh.tyCh);
+
+			src.debug.printArray(selRec, "~", true);
 		}
 	}
 }
