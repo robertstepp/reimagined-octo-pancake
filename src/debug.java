@@ -94,12 +94,12 @@ public class debug {
 	public static void printArray(ArrayList<String[]> outtie, String delim, boolean special) {
 		// TODO: Either add ranges as a param, or remove "j" conditionals when
 		// done testing
-		int j = 0;
+		//int j = 0;
 		System.out.println("SOME OF ARRAYLIST<STRING[]> PASSED:");
 		for (String[] innie : outtie) {
 			//if ((j < 3) || (j > outtie.size() - 4))
 				printArray(innie, delim);
-			++j;
+			//++j;
 		}
 	}
 }

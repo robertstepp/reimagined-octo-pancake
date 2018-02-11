@@ -19,6 +19,138 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Ross {
+/////// 1st stage
+	/**
+	 * First interaction with the user. Asks for filepath and uses default
+	 * passed to it if their entry is blank
+	 * 
+	 * @param filename
+	 *            The file which'll will be returned if the user enters nothing
+	 * @return String containing the user's entered filename or, barring that,
+	 *         the default
+	 */
+	public static String input(String filename) {
+		JTextField preFilename = new JTextField(10);
+		JPanel inputFilename = new JPanel();
+		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
+		inputFilename.add(preFilename);
+		JOptionPane.showConfirmDialog(null, inputFilename, "Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
+		String tempFilename = preFilename.getText();
+		if (tempFilename.length() > 0)
+			filename = tempFilename;
+		return filename;
+	}
+
+	/////// 2nd
+	/**
+	 * TODO: Update method documentation structFromStream takes filepath,
+	 * delimiter, date format, and column keywords of interest. In return, it
+	 * provides an ArrayList whose first-dimension elements are: 0) the indices
+	 * of columns of interest 1) all relevant values which occur in those
+	 * columns, and 2) the line-by-line records themselves
+	 * 
+	 * @param file
+	 *            String path to the file to parse
+	 * @param del
+	 *            String delimiter which separates fields
+	 * @param daFo
+	 *            String date format which LocalDate parses with
+	 * @param cols
+	 *            String[] containing textual column definitions (from the
+	 *            header)
+	 * @return An ArrayList of Objects, each of which are super-fun themselves
+	 * @throws IOException
+	 */
+	public static magicTuple structFromStream(String file, String del, String daFo, String[] cols) throws IOException {
+		// The columnar positions of the fields we're recording possible values
+		// for
+		// Index [0=beat, 1=sector, 2=precinct, 3=date]
+		// TODO: This is hardcoded and would probably be more appropriately
+		// represented by a linked list or something
+		int[] whichCol = { -1, -1, -1, -1 };
+		// Assumption: first column containing any occurrence of the keyword is
+		// the one we want
+		for (int q = 0; q < cols.length; ++q) {
+			String col = cols[q].toLowerCase();
+			if ((whichCol[0] == -1) && (col.contains("beat")))
+				whichCol[0] = q;
+			else if ((whichCol[1] == -1) && (col.contains("sector")))
+				whichCol[1] = q;
+			else if ((whichCol[2] == -1) && (col.contains("precinct")))
+				whichCol[2] = q;
+			else if ((whichCol[3] == -1) && (col.contains("date")))
+				whichCol[3] = q;
+		}
+
+		// For unique or extreme values for the fields we'll present for user
+		// selection
+		ArrayList<String> beats = new ArrayList<String>();
+		ArrayList<String> sectors = new ArrayList<String>();
+		ArrayList<String> precincts = new ArrayList<String>();
+		// https://www.mkyong.com/java/how-to-compare-dates-in-java/
+		// ArrayList<LocalDate> dates = new ArrayList<LocalDate>();
+		LocalDate[] daDates = new LocalDate[2];
+
+		// https://docs.oracle.com/javase/tutorial/datetime/iso/format.html
+		// Index 0 "is" (will be) earliest date found
+		daDates[0] = LocalDate.now();
+		// Index 1 is latest date found
+		daDates[1] = LocalDate.of(1900, 1, 1);
+		// currDate is date of the current record
+		LocalDate currDate = LocalDate.of(1901, 1, 1);
+
+		ArrayList<String[]> theRecords = new ArrayList<String[]>();
+		theRecords.ensureCapacity(numberOfRows(file));
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		// Ditch first line (presumed header)
+		br.readLine();
+		// TODO: should this be a do-while loop? Not very important
+		String curLine = br.readLine();
+		String[] splitLine;
+		while (curLine != null) {
+			splitLine = listFromString(curLine, del);
+			// Discard record if different number of columns than header
+			if (splitLine.length == cols.length) {
+				theRecords.add(splitLine);
+				// Add each unique occurrence of beats, sectors, and precincts
+				// to our lists of possibilities
+				if (!(beats.contains(splitLine[whichCol[0]])))
+					beats.add(splitLine[whichCol[0]]);
+				if (!(sectors.contains(splitLine[whichCol[1]])))
+					sectors.add(splitLine[whichCol[1]]);
+				if (!(precincts.contains(splitLine[whichCol[2]])))
+					precincts.add(splitLine[whichCol[2]]);
+				// Turn our date string into a LocalDate
+				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(daFo));
+				// If the current record's date is earlier and/or later than our
+				// thus-far-seen extremes, it becomes the new extreme(s)
+				if (currDate.isBefore(daDates[0]))
+					daDates[0] = currDate;
+				if (currDate.isAfter(daDates[1]))
+					daDates[1] = currDate;
+			}
+			curLine = br.readLine();
+		}
+		br.close();
+
+		ArrayList<String[]> textVals = new ArrayList<String[]>();
+		// Make our lists of textual possibilities "naturally ordered"
+		// (alphabetical) (We're preferring the order from the file for
+		// precincts (better reflects cardinal biases, orientation of map image,
+		// and reading direction))
+		Collections.sort(beats);
+		String[] daBeats = beats.toArray(new String[beats.size()]);
+		Collections.sort(sectors);
+		String[] daSectors = sectors.toArray(new String[sectors.size()]);
+		String[] daPrecincts = precincts.toArray(new String[precincts.size()]);
+		textVals.add(daBeats);
+		textVals.add(daSectors);
+		textVals.add(daPrecincts);
+
+		magicTuple allTheThings = new magicTuple(whichCol, textVals, daDates, theRecords);
+		return allTheThings;
+	}
+
 	/**
 	 * getColDefs finds column definitions from a text file's header
 	 * (Assumption: single line header.)
@@ -78,147 +210,7 @@ public class Ross {
 		return list;
 	}
 
-	/**
-	 * structFromStream takes filepath, delimiter, date format, and column
-	 * keywords of interest. In return, it provides an ArrayList whose
-	 * first-dimension elements are: 0) the indices of columns of interest 1)
-	 * all relevant values which occur in those columns, and 2) the line-by-line
-	 * records themselves
-	 * 
-	 * @param file
-	 *            String path to the file to parse
-	 * @param del
-	 *            String delimiter which separates fields
-	 * @param daFo
-	 *            String date format which LocalDate parses with
-	 * @param cols
-	 *            String[] containing textual column definitions (from the
-	 *            header)
-	 * @return An ArrayList of Objects, each of which are super-fun themselves
-	 * @throws IOException
-	 */
-	public static magicTuple structFromStream(String file, String del, String daFo, String[] cols) throws IOException {
-		// The columnar positions of the fields we're recording possible values
-		// for
-		// Index [0=beat, 1=sector, 2=precinct, 3=date]
-		// TODO: This is hardcoded and would probably be more appropriately
-		// represented by a linked list or something
-		int[] whichCol = { -1, -1, -1, -1 };
-		// Assumption: first column containing any occurrence of the keyword is
-		// the one we want
-		for (int q = 0; q < cols.length; ++q) {
-			String col = cols[q].toLowerCase();
-			if ((whichCol[0] == -1) && (col.contains("beat")))
-				whichCol[0] = q;
-			else if ((whichCol[1] == -1) && (col.contains("sector")))
-				whichCol[1] = q;
-			else if ((whichCol[2] == -1) && (col.contains("precinct")))
-				whichCol[2] = q;
-			else if ((whichCol[3] == -1) && (col.contains("date")))
-				whichCol[3] = q;
-		}
-
-		// For unique or extreme values for the fields we'll present for user
-		// selection
-		ArrayList<String> beats = new ArrayList<String>();
-		ArrayList<String> sectors = new ArrayList<String>();
-		ArrayList<String> precincts = new ArrayList<String>();
-		// ArrayList<LocalDate> dates = new ArrayList<LocalDate>();
-		LocalDate[] daDates = new LocalDate[2];
-
-		// https://docs.oracle.com/javase/tutorial/datetime/iso/format.html
-		// Index 0 "is" (will be) earliest date found
-		daDates[0] = LocalDate.now();
-		// Index 1 is latest date found
-		daDates[1] = LocalDate.of(1900, 1, 1);
-		// currDate is date of the current record
-		LocalDate currDate = LocalDate.of(1901, 1, 1);
-
-		ArrayList<String[]> theRecords = new ArrayList<String[]>();
-		theRecords.ensureCapacity(numberOfRows(file));
-		BufferedReader br = new BufferedReader(new FileReader(file));
-		// Ditch first line (presumed header)
-		br.readLine();
-		// TODO: should this be a do-while loop? Not very important
-		String curLine = br.readLine();
-		String[] splitLine;
-		while (curLine != null) {
-			splitLine = listFromString(curLine, del);
-			// Discard record if different number of columns than header
-			if (splitLine.length == cols.length) {
-				theRecords.add(splitLine);
-				// Add each unique occurrence of beats, sectors, and precincts
-				// to our lists of possibilities
-				if (!(beats.contains(splitLine[whichCol[0]])))
-					beats.add(splitLine[whichCol[0]]);
-				if (!(sectors.contains(splitLine[whichCol[1]])))
-					sectors.add(splitLine[whichCol[1]]);
-				if (!(precincts.contains(splitLine[whichCol[2]])))
-					precincts.add(splitLine[whichCol[2]]);
-				// Turn our date string into a LocalDate
-				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(daFo));
-				// If the current record's date is earlier and/or later than our
-				// thus-far-seen extremes, it becomes the new extreme(s)
-				if (currDate.isBefore(daDates[0]))
-					daDates[0] = currDate;
-				if (currDate.isAfter(daDates[1]))
-					daDates[1] = currDate;
-			}
-			curLine = br.readLine();
-		}
-		br.close();
-
-		// Make our lists of textual possibilities "naturally ordered"
-		// (alphabetical) (We're preferring the order from the file for
-		// precincts (better reflects cardinal biases, orientation of map image,
-		// and reading direction))
-		Collections.sort(beats);
-		Collections.sort(sectors);
-
-		String[] daBeats = beats.toArray(new String[beats.size()]);
-		String[] daSectors = sectors.toArray(new String[sectors.size()]);
-		String[] daPrecincts = precincts.toArray(new String[precincts.size()]);
-
-		ArrayList<String[]> textVals = new ArrayList<String[]>();
-		textVals.add(daBeats);
-		textVals.add(daSectors);
-		textVals.add(daPrecincts);
-
-		magicTuple allTheThings = new magicTuple(whichCol, textVals, daDates, theRecords);
-		return allTheThings;
-	}
-
-	private static ArrayList<String[]> cullRecords(magicTuple allDat, decisions thCh, String dateForm) {
-		// TODO Auto-generated method stub
-		ArrayList<String[]> recSel = new ArrayList<String[]>();
-
-		LocalDate minDate = thCh.daCh[0];
-		LocalDate maxDate = thCh.daCh[1];
-
-		int dateCol = allDat.colPos[3];
-		int precCol = allDat.colPos[2];
-		int beatCol = allDat.colPos[0];
-
-		String precReq = thCh.bpCh[0];
-		String beatReq = thCh.bpCh[1];
-
-		// LocalDate recDate = new LocalDate.now();
-		String recPrec, recBeat;
-
-		for (String[] aRecord : allDat.theRecs) {
-			LocalDate recDate = LocalDate.parse(aRecord[dateCol], DateTimeFormatter.ofPattern(dateForm));
-			recPrec = aRecord[precCol];
-			recBeat = aRecord[beatCol];
-			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate))))
-				if (!(recDate.isAfter(maxDate)))
-					if (!(recDate.isBefore(minDate)))
-						if (recPrec.equals(precReq))
-							if (recBeat.equals(beatReq))
-								recSel.add(aRecord);
-		}
-		return recSel;
-	}
-
+	/////// 3rd
 	/**
 	 * getChoices (via submethods) obtains from the user their choices after
 	 * relevant options have been obtained from the data
@@ -237,7 +229,6 @@ public class Ross {
 	 */
 	public static decisions getChoices(String dateForm, LocalDate[] dateLimits, String imgLoc,
 			LinkedHashMap<String, String[]> bpAssoc, String[] beatOpts, String[] precOpts, String[] typeOpts) {
-
 		// Get user's chosen min/max dates
 		LocalDate[] daChoice = getDateRange(dateForm, dateLimits);
 		// Show user the beat(/sector)/precinct map to aid their areal choosings
@@ -247,7 +238,6 @@ public class Ross {
 		// Get user's crime type of focus
 		// GOODGOODGOOD
 		String tyChoice = getTypeOfCrime(typeOpts);
-
 		// Return the decisions/choices of all our submethods
 		decisions choices = new decisions(daChoice, bpChoice, tyChoice);
 		return choices;
@@ -272,7 +262,6 @@ public class Ross {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateForm);
 		boolean validRange = false;
-
 		while (!validRange) {
 			JPanel dPanel = new JPanel();
 			dPanel.add(new JLabel("Beginning date:"));
@@ -358,11 +347,11 @@ public class Ross {
 		String bc = theBeats[be.getSelectedIndex()];
 		String pc = thePrecincts[prec.getSelectedIndex()];
 		String[] bpChoice = { pc, bc };
-
+		// TODO: THIS WILL BE FIXED ASAP!! :)
 		if (Arrays.asList(bpAssoc.get(pc)).contains(bc)) {
 			System.out.println("WINNNNNN");
 		} else {
-			System.out.println("FUCKITALLLLLL");
+			System.out.println("BRAINSSSSS");
 		}
 
 		return bpChoice;
@@ -384,17 +373,45 @@ public class Ross {
 		return types[type.getSelectedIndex()];
 	}
 
-	public static String input() {
-		String fileName = "";
-		JTextField preFilename = new JTextField(10);
-		JPanel inputFilename = new JPanel();
-		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
-		inputFilename.add(preFilename);
-		JOptionPane.showConfirmDialog(null, inputFilename, "Please Enter Filename:", JOptionPane.OK_CANCEL_OPTION);
-		fileName = preFilename.getText();
-		return fileName;
-	}
+	/////// 4th
+	/**
+	 * Perhaps "select records" would be a better name. Anyway, take the data
+	 * obtained, combine with the decisions made and parse format specified...
+	 * and return two ArrayLists of String[] records, one which matches
+	 * everything with just precinct for area, the second exactly everything,
+	 * down to beat
+	 * 
+	 * @param allDat
+	 *            A magicTuple containing our parsed data
+	 * @param thCh
+	 *            A decisions containing choices made by the user
+	 * @param dateForm
+	 *            A String indicating the date parse/format layout
+	 * @return A selecARec consisting of two sets of records as
+	 *         ArrayList-String[]'s
+	 */
+	private static selecARec cullRecords(magicTuple allDat, decisions thCh, String dateForm) {
+		int dateCol = allDat.colPos[3], precCol = allDat.colPos[2], beatCol = allDat.colPos[0];
+		LocalDate minDate = thCh.daCh[0], maxDate = thCh.daCh[1];
+		String precReq = thCh.bpCh[0], beatReq = thCh.bpCh[1];
 
+		ArrayList<String[]> beatRecs = new ArrayList<String[]>();
+		ArrayList<String[]> precRecs = new ArrayList<String[]>();
+
+		for (String[] aRecord : allDat.theRecs) {
+			LocalDate recDate = LocalDate.parse(aRecord[dateCol], DateTimeFormatter.ofPattern(dateForm));
+			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate))))
+				if (aRecord[precCol].equals(precReq)) {
+					precRecs.add(aRecord);
+					if (aRecord[beatCol].equals(beatReq))
+						beatRecs.add(aRecord);
+				}
+		}
+		selecARec recBag = new selecARec(beatRecs, precRecs);
+		return recBag;
+	}
+///////
+///////
 	public static void main(String[] args) throws IOException {
 		// Defaults/constants/hardcodes
 		String filename = "datasets/original raw data-DON'T MODIFY.csv";
@@ -402,7 +419,7 @@ public class Ross {
 		String delimiter = ",";
 		String dateFormat = "MM/dd/yyyy";
 		// Here's our representation of which beats are in which precinct.
-		// Ideally we'd be pulling this from the records, not sure if we'll have
+		// Ideally we'd be pulling this from the records, probably won't have
 		// time to implement
 		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
 		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3", "N1", "N2", "N3", "U1", "U2", "U3" };
@@ -415,25 +432,21 @@ public class Ross {
 		pb.put("SE", se);
 		String[] sw = { "F1", "F2", "F3", "W1", "W2", "W3" };
 		pb.put("SW", sw);
-		// Same structure for crime classes membership as far precinct
-		// memnership
+		// Same structure for classes of crime as far precinct
+		// membership
 		String[] crimeClasses = { "Person", "Property" };
-		LinkedHashMap<String, String[]> pp = new LinkedHashMap<String, String[]>();
+		// TODO: ? LinkedHashMap<String, String[]> pp = new LinkedHashMap<String, String[]>();
 		String[] persCrim = { "Homicide", "Rape", "Robbery", "Aggravated Assault" };
 		pb.put(crimeClasses[0], persCrim);
 		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft", "Burglary" };
 		pb.put(crimeClasses[1], propCrim);
 		final boolean DEBUG = true;
 
-		// Obtain from user which file has the records, which will provide our
-		// data and the parameters of our options
-		String tempFilename = "";
-		tempFilename = input();
-		if (tempFilename.length() > 0)
-			filename = tempFilename;
-
-		// Obtain from the file our categories
-		String[] colDefs = getColDefs(filename, delimiter);
+		// BEGIN user interaction
+		// Obtain from user which file has the records (which will provide our
+		// data and the parameters of our options)
+		filename = input(filename);
+		String[] colDefs=getColDefs(filename,delimiter);
 		// Now that we know our header, we can parse our file into structured
 		// data
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
@@ -442,7 +455,8 @@ public class Ross {
 		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0),
 				allDat.getTextVals().get(2), crimeClasses);
 		// Choices made, we can now cull our records
-		ArrayList<String[]> selRec = cullRecords(allDat, thCh, dateFormat);
+		selecARec chosenOness = cullRecords(allDat, thCh, dateFormat);
+		// END user interaction
 
 		if (DEBUG) {
 			System.out.println("###INITIAL###");
@@ -454,18 +468,16 @@ public class Ross {
 			src.debug.printArray(colDefs, " \t ");
 			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			// src.debug.printArray(allDat.getTheRecs(), " \t ", true);
-
 			System.out.println();
 			System.out.println("###EFFECTIVE###");
 			src.debug.printFilename(filename);
-
 			System.out.println();
 			System.out.println("###CHOSEN###");
 			src.debug.printDates(thCh.getDaCh(), dateFormat);
 			// src.debug.printArray(thCh.bpCh, ", ");
 			System.out.println("TYPE CHOSEN: " + thCh.tyCh);
-
-			src.debug.printArray(selRec, "\t", true);
+			src.debug.printArray(chosenOness.beatRecs, "\t", true);
+			src.debug.printArray(chosenOness.precRecs, "\t", true);
 		}
 	}
 }
