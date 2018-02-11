@@ -10,12 +10,13 @@ import java.io.LineNumberReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 //import java.util.Arrays;
 import java.util.Collections;
 //import java.util.Date;
 //import java.util.List;
 import java.util.LinkedHashMap;
-import java.util.Map;
+//import java.util.Map;
 
 //import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -213,7 +214,7 @@ public class Ross {
 	 *            String ArrayList of precinct options
 	 */
 	public static decisions getChoices(String dateForm, LocalDate[] dateLimits, String imgLoc,
-			LinkedHashMap<String,String[]> bpAssoc, String[] beatOpts, String[] precOpts, String[] typeOpts) {
+			LinkedHashMap<String, String[]> bpAssoc, String[] beatOpts, String[] precOpts, String[] typeOpts) {
 
 		// Get user's chosen min/max dates
 		LocalDate[] daChoice = getDateRange(dateForm, dateLimits);
@@ -222,6 +223,7 @@ public class Ross {
 		// Get user's chosen beat and precinct
 		String[] bpChoice = getBeatPrecinct(bpAssoc, beatOpts, precOpts);
 		// Get user's crime type of focus
+		// GOODGOODGOOD
 		String tyChoice = getTypeOfCrime(typeOpts);
 
 		// Return the decisions/choices of all our submethods
@@ -316,23 +318,31 @@ public class Ross {
 	 *            A String[] of all the precinct possibilities
 	 * @return
 	 */
-	public static String[] getBeatPrecinct(LinkedHashMap<String, String[]> bpAssoc, String[] theBeats, String[] thePrecincts) {
+	public static String[] getBeatPrecinct(LinkedHashMap<String, String[]> bpAssoc, String[] theBeats,
+			String[] thePrecincts) {
 		JPanel bpPanel = new JPanel();
 
 		JComboBox<?> prec = new JComboBox<Object>(thePrecincts);
 		bpPanel.add(new JLabel("Precinct:"));
 		bpPanel.add(prec);
-		String precChoice; // ???
 
 		JComboBox<?> be = new JComboBox<Object>(theBeats);
 		bpPanel.add(new JLabel("Beat:"));
 		bpPanel.add(be);
-		String beatChoice;
 
 		JOptionPane.showConfirmDialog(null, bpPanel, "Please choose a precinct and a beat within it:",
 				JOptionPane.DEFAULT_OPTION);
 
-		String[] bpChoice = { "prec", "be" };
+		String bc = theBeats[be.getSelectedIndex()];
+		String pc = thePrecincts[prec.getSelectedIndex()];
+		String[] bpChoice = { pc, bc };
+
+		if (Arrays.asList(bpAssoc.get(pc)).contains(bc)) {
+			System.out.println("WINNNNNN");
+		} else {
+			System.out.println("FUCKITALLLLLL");
+		}
+
 		return bpChoice;
 	}
 
@@ -344,15 +354,11 @@ public class Ross {
 	 *            available
 	 */
 	public static String getTypeOfCrime(String[] types) {
-		JPanel inputType = new JPanel();
+		JPanel tPanel = new JPanel();
 		JComboBox<?> type = new JComboBox<Object>(types);
-		inputType.add(new JLabel("Type requested:"));
-		inputType.add(type);
-		JOptionPane.showConfirmDialog(null, inputType, "Enter requested type:", JOptionPane.OK_CANCEL_OPTION);
-		// Will aim to make all debug output run from main(), that way there's a
-		// builtin check to ensure actual data needing to be returned/passed is
-		// System.out.println(types[type.getSelectedIndex()]);
-		String typeChoice = "ichose";
+		tPanel.add(new JLabel("Type requested:"));
+		tPanel.add(type);
+		JOptionPane.showConfirmDialog(null, tPanel, "Enter requested type:", JOptionPane.OK_CANCEL_OPTION);
 		return types[type.getSelectedIndex()];
 	}
 
@@ -373,7 +379,21 @@ public class Ross {
 		String mapLoc = "src/beat-map-2.png";
 		String delimiter = ",";
 		String dateFormat = "MM/dd/yyyy";
-		String[] crimeClasses = {"Personal","Property"};
+		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
+		// Here's our representation of which beats are in which precinct.
+		// Ideally we'd be pulling this from the records, not sure if we'll have
+		// time to implement
+		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3", "N1", "N2", "N3", "U1", "U2", "U3" };
+		String[] w = { "D1", "D2", "D3", "K1", "K2", "K3", "M1", "M2", "M3", "Q1", "Q2", "Q3" };
+		String[] e = { "C1", "C2", "C3", "E1", "E2", "E3", "G1", "G2", "G3" };
+		String[] se = { "O1", "O2", "O3", "R1", "R2", "R3", "S1", "S2", "S3" };
+		String[] sw = { "F1", "F2", "F3", "W1", "W2", "W3" };
+		pb.put("N", n);
+		pb.put("W", w);
+		pb.put("E", e);
+		pb.put("SE", se);
+		pb.put("SW", sw);
+		String[] crimeClasses = { "Personal", "Property" };
 		final boolean DEBUG = true;
 
 		// Obtain from user which file has the records, which will provide our
@@ -388,23 +408,14 @@ public class Ross {
 		// Now that we know our header, we can parse our file into structured
 		// data
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
-		// With our structured data, we can ask the user their choice among the possibilities
-	
-		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
-		String[] nw = { "n1", "n2", "n3" };
-		String[] sw = { "s1", "s2", "s3", "q5", "q7", "q9" };
-		String[] yom = { "b", "a", "d", " ", "a", "s", "s" };
-		String[] aa = { "berf" };
-		pb.put("yom", yom);
-		pb.put("aa", aa);
-		pb.put("nw", nw);
-		pb.put("sw", sw);
+		// With our structured data, we can ask the user their choice among the
+		// possibilities
 
-		
-		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0), allDat.getTextVals().get(1), crimeClasses);
+		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0),
+				allDat.getTextVals().get(1), crimeClasses);
 
 		if (DEBUG) {
-			// Initial infos :
+			System.out.println("###INITIAL###");
 			src.debug.printDates(allDat.getDateVals(), dateFormat);
 			src.debug.printArray(allDat.getTextVals().get(0), ",");
 			src.debug.printArray(allDat.getTextVals().get(1), ",");
@@ -414,13 +425,15 @@ public class Ross {
 			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			src.debug.printArray(allDat.getTheRecs(), " \t ", true);
 
-			// The effective value, but not sure if different than original/default:
+			System.out.println();
+			System.out.println("###EFFECTIVE###");
 			src.debug.printFilename(filename);
-			
-			// User choices:
+
+			System.out.println();
+			System.out.println("###CHOSEN###");
 			src.debug.printDates(thCh.getDaCh(), dateFormat);
 			src.debug.printArray(thCh.bpCh, ", ");
 			System.out.println("TYPE CHOSEN: " + thCh.tyCh);
-			}
+		}
 	}
 }
