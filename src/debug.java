@@ -1,4 +1,4 @@
-// Java Program by Ross Hemphill & Robert Stepp 02/11/2018
+// Java Program by Ross Hemphill & Robert Stepp 11 Feb 2018
 package src;
 
 import java.time.LocalDate;
