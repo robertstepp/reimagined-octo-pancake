@@ -6,7 +6,9 @@ import java.util.Map;
 
 /**
  * I'm currently confusing myself with "How did I create this and then not use
- * it?!" TODO: Is this trash, self? Testing for use for the crime classes?
+ * it?!" TODO: Is this trash, self? Testing for use for the crime classes? I bet
+ * I was feeling hopeful about removing hardcodes by have figured out named
+ * sublists by LinkedHashMap's... or sumpin
  * 
  * @author Ross
  *

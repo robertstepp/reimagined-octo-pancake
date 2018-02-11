@@ -44,11 +44,13 @@ public class Ross {
 
 	/////// 2nd
 	/**
-	 * TODO: Update method documentation structFromStream takes filepath,
-	 * delimiter, date format, and column keywords of interest. In return, it
-	 * provides an ArrayList whose first-dimension elements are: 0) the indices
-	 * of columns of interest 1) all relevant values which occur in those
-	 * columns, and 2) the line-by-line records themselves
+	 * TODO: Update method documentation
+	 * 
+	 * structFromStream takes filepath, delimiter, date format, and column
+	 * keywords of interest. In return, it provides an ArrayList whose
+	 * first-dimension elements are: 0) the indices of columns of interest 1)
+	 * all relevant values which occur in those columns, and 2) the line-by-line
+	 * records themselves
 	 * 
 	 * @param file
 	 *            String path to the file to parse
@@ -350,7 +352,6 @@ public class Ross {
 
 			bc = theBeats[be.getSelectedIndex()];
 			pc = thePrecincts[prec.getSelectedIndex()];
-			// TODO: THIS WILL BE FIXED ASAP!! ;)
 			if (Arrays.asList(bpAssoc.get(pc)).contains(bc))
 				theWorldIsGood = true;
 		}
@@ -400,19 +401,17 @@ public class Ross {
 		ArrayList<String[]> beatRecs = new ArrayList<String[]>();
 		ArrayList<String[]> precRecs = new ArrayList<String[]>();
 
-		String ct = "";
 		for (String[] aRecord : allDat.theRecs) {
 			LocalDate recDate = LocalDate.parse(aRecord[dateCol], DateTimeFormatter.ofPattern(dateForm));
-			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate)))) {
-				ct = aRecord[1]; // Danger Will Robinson, hardcoded column
-									// position for CRIME_TYPE!
-				if (Arrays.asList(crimeCateg.get(thCh.tyCh)).contains(ct))
+			if (!((recDate.isAfter(maxDate)) || (recDate.isBefore(minDate))))
+				// Danger Will Robinson, hardcoded column position for
+				// CRIME_TYPE! (aRecord[1])
+				if (Arrays.asList(crimeCateg.get(thCh.tyCh)).contains(aRecord[1]))
 					if (aRecord[precCol].equals(precReq)) {
 						precRecs.add(aRecord);
 						if (aRecord[beatCol].equals(beatReq))
 							beatRecs.add(aRecord);
 					}
-			}
 		}
 		selecARec recBag = new selecARec(beatRecs, precRecs);
 		return recBag;
@@ -444,9 +443,19 @@ public class Ross {
 		// membership
 		LinkedHashMap<String, String[]> cc = new LinkedHashMap<String, String[]>();
 		String[] crimeClasses = { "Person", "Property" };
-		String[] persCrim = { "Homicide", "Rape", "Robbery", "Aggravated Assault" }; // TODO: Is aggr. assault showing up properly?
+		String[] persCrim = { "Homicide", "Rape", "Robbery", "Aggravated Assault" }; // TODO:
+																						// Is
+																						// aggr.
+																						// assault
+																						// showing
+																						// up
+																						// properly?
 		cc.put(crimeClasses[0], persCrim);
-		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft", "Burglary" }; // TODO: Is arson showing up?
+		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft", "Burglary" }; // TODO:
+																											// Is
+																											// arson
+																											// showing
+																											// up?
 		cc.put(crimeClasses[1], propCrim);
 		////
 		final boolean DEBUG = true;
@@ -483,11 +492,11 @@ public class Ross {
 			src.debug.printFilename(filename);
 			System.out.println();
 			System.out.println("###CHOSEN###");
-		 	src.debug.printDates(thCh.getDaCh(), dateFormat);
+			src.debug.printDates(thCh.getDaCh(), dateFormat);
 			// src.debug.printArray(thCh.bpCh, ", ");
 			System.out.println("TYPE CHOSEN: " + thCh.tyCh);
 			src.debug.printArray(chosenOness.beatRecs, "\t", true);
-	//		src.debug.printArray(chosenOness.precRecs, "\t", true);
+			// src.debug.printArray(chosenOness.precRecs, "\t", true);
 		}
 	}
 }
