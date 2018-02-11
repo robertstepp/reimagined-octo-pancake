@@ -322,7 +322,7 @@ public class Ross {
 		JComboBox<?> prec = new JComboBox<Object>(thePrecincts);
 		bpPanel.add(new JLabel("Precinct:"));
 		bpPanel.add(prec);
-		String precChoice;
+		String precChoice; // ???
 
 		JComboBox<?> be = new JComboBox<Object>(theBeats);
 		bpPanel.add(new JLabel("Beat:"));
@@ -353,7 +353,7 @@ public class Ross {
 		// builtin check to ensure actual data needing to be returned/passed is
 		// System.out.println(types[type.getSelectedIndex()]);
 		String typeChoice = "ichose";
-		return typeChoice;
+		return types[type.getSelectedIndex()];
 	}
 
 	public static String input() {
@@ -401,11 +401,10 @@ public class Ross {
 		pb.put("sw", sw);
 
 		
-		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc,
-				pb, allDat.getTextVals().get(0), allDat.getTextVals().get(1), crimeClasses);
+		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0), allDat.getTextVals().get(1), crimeClasses);
 
 		if (DEBUG) {
-			src.debug.printFilename(filename);
+			// Initial infos :
 			src.debug.printDates(allDat.getDateVals(), dateFormat);
 			src.debug.printArray(allDat.getTextVals().get(0), ",");
 			src.debug.printArray(allDat.getTextVals().get(1), ",");
@@ -414,6 +413,14 @@ public class Ross {
 			src.debug.printArray(colDefs, " \t ");
 			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			src.debug.printArray(allDat.getTheRecs(), " \t ", true);
-		}
+
+			// The effective value, but not sure if different than original/default:
+			src.debug.printFilename(filename);
+			
+			// User choices:
+			src.debug.printDates(thCh.getDaCh(), dateFormat);
+			src.debug.printArray(thCh.bpCh, ", ");
+			System.out.println("TYPE CHOSEN: " + thCh.tyCh);
+			}
 	}
 }
