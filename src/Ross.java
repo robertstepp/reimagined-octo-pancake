@@ -379,21 +379,28 @@ public class Ross {
 		String mapLoc = "src/beat-map-2.png";
 		String delimiter = ",";
 		String dateFormat = "MM/dd/yyyy";
-		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
 		// Here's our representation of which beats are in which precinct.
 		// Ideally we'd be pulling this from the records, not sure if we'll have
 		// time to implement
+		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
 		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3", "N1", "N2", "N3", "U1", "U2", "U3" };
-		String[] w = { "D1", "D2", "D3", "K1", "K2", "K3", "M1", "M2", "M3", "Q1", "Q2", "Q3" };
-		String[] e = { "C1", "C2", "C3", "E1", "E2", "E3", "G1", "G2", "G3" };
-		String[] se = { "O1", "O2", "O3", "R1", "R2", "R3", "S1", "S2", "S3" };
-		String[] sw = { "F1", "F2", "F3", "W1", "W2", "W3" };
 		pb.put("N", n);
+		String[] w = { "D1", "D2", "D3", "K1", "K2", "K3", "M1", "M2", "M3", "Q1", "Q2", "Q3" };
 		pb.put("W", w);
+		String[] e = { "C1", "C2", "C3", "E1", "E2", "E3", "G1", "G2", "G3" };
 		pb.put("E", e);
+		String[] se = { "O1", "O2", "O3", "R1", "R2", "R3", "S1", "S2", "S3" };
 		pb.put("SE", se);
+		String[] sw = { "F1", "F2", "F3", "W1", "W2", "W3" };
 		pb.put("SW", sw);
-		String[] crimeClasses = { "Personal", "Property" };
+		// Same structure for crime classes membership as far precinct
+		// memnership
+		String[] crimeClasses = { "Person", "Property" };
+		LinkedHashMap<String, String[]> pp = new LinkedHashMap<String, String[]>();
+		String[] persCrim = { "Homicide", "Rape", "Robbery", "Aggravated Assault" };
+		pb.put(crimeClasses[0], persCrim);
+		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft", "Burglary" };
+		pb.put(crimeClasses[1], propCrim);
 		final boolean DEBUG = true;
 
 		// Obtain from user which file has the records, which will provide our
@@ -410,7 +417,6 @@ public class Ross {
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
 		// With our structured data, we can ask the user their choice among the
 		// possibilities
-
 		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0),
 				allDat.getTextVals().get(2), crimeClasses);
 
