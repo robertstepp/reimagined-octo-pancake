@@ -482,13 +482,13 @@ public class Ross {
 		LinkedHashMap<String, String[]> cc = new LinkedHashMap<String, String[]>();
 		String[] crimeClasses = { "Person", "Property" };
 		String[] persCrim = { "Homicide", "Rape", "Robbery",
-				"Aggravated Assault" }; // TODO:
-										// Is
-										// aggravated
-										// assault
-										// showing
-										// up
-										// properly?
+				"Assault" }; // TODO:
+								// Is
+								// aggravated
+								// assault
+								// showing
+								// up
+								// properly?
 		cc.put(crimeClasses[0], persCrim);
 		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft",
 				"Motor Vehicle Theft" }; // TODO:
