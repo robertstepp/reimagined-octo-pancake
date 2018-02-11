@@ -487,11 +487,11 @@ public class Ross {
 										// properly?
 		cc.put(crimeClasses[0], persCrim);
 		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft",
-				"Motor Vehicle Theft", "Burglary" }; // TODO:
-														// Is
-														// arson
-														// showing
-														// up?
+				"Motor Vehicle Theft" }; // TODO:
+											// Is
+											// arson
+											// showing
+											// up?
 		cc.put(crimeClasses[1], propCrim);
 		////
 		final boolean DEBUG = true;
