@@ -114,7 +114,7 @@ public class Ross {
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		// Ditch first line (presumed header)
 		br.readLine();
-		// TODO: should this be a do-while loop? Not very important
+		// Should this be a do-while loop? Not very important
 		String curLine = br.readLine();
 		String[] splitLine;
 		while (curLine != null) {
@@ -297,10 +297,6 @@ public class Ross {
 			endChoice.setText(dateLims[1].format(formatter));
 			dPanel.add(endChoice);
 
-			// TODO: Move information from titlebar to inside dialog?
-			// Each JTextField at 12 wide just barely fits informative titlebar
-			// on MY
-			// computer...
 			JOptionPane.showConfirmDialog(null,
 					dPanel,
 					"Please enter date range of interest:",
@@ -488,20 +484,10 @@ public class Ross {
 		LinkedHashMap<String, String[]> cc = new LinkedHashMap<String, String[]>();
 		String[] crimeClasses = { "Person", "Property" };
 		String[] persCrim = { "Homicide", "Rape", "Robbery",
-				"Assault" }; // TODO:
-								// Is
-								// aggravated
-								// assault
-								// showing
-								// up
-								// properly?
+				"Assault" };
 		cc.put(crimeClasses[0], persCrim);
 		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft",
-				"Motor Vehicle Theft" }; // TODO:
-											// Is
-											// arson
-											// showing
-											// up?
+				"Motor Vehicle Theft" };
 		cc.put(crimeClasses[1], propCrim);
 		////
 		final boolean DEBUG = true;
