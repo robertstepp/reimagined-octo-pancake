@@ -58,7 +58,7 @@ public class debug {
 	 *            Delimiter between Strings
 	 */
 	public static void printArray(ArrayList<String> al, String delim) {
-		System.out.print("ARRAYLIST<STRING> PASSED: \t");
+		System.out.print("ARRAYLIST<STRING> PASSED: ");
 		for (String s : al)
 			System.out.print(s + delim);
 		System.out.println();
@@ -74,7 +74,7 @@ public class debug {
 	 *            Delimiter after Springs
 	 */
 	public static void printArray(String[] sa, String delim) {
-		System.out.print("STRING[] PASSED: \t");
+		System.out.print("STRING[] PASSED: ");
 		for (String s : sa)
 			System.out.print(s + delim);
 		System.out.println();
@@ -102,5 +102,4 @@ public class debug {
 			++j;
 		}
 	}
-
 }

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 class magicTuple {
 	int[] colPos;
 	ArrayList<String[]> textVals = new ArrayList<String[]>();
+// the extremes of dates represented in the records
 	LocalDate[] dateVals = new LocalDate[2];
 	ArrayList<String[]> theRecs = new ArrayList<String[]>();
 

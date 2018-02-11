@@ -325,8 +325,6 @@ public class Ross {
 		JOptionPane.showConfirmDialog(null, bpPanel, "Please choose a precinct and a beat within it:",
 				JOptionPane.DEFAULT_OPTION);
 
-		
-		
 		String[] bpChoice = { "prec", "be" };
 		return bpChoice;
 	}
@@ -377,11 +375,9 @@ public class Ross {
 		String[] colDefs = getColDefs(filename, delimiter);
 		// structFromStream sets allDat's dateVals to the range AVAILABLE
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
-		// this RESETS allDat's dateVals to those CHOSEN by user input
-		// (probably will end up having getChoices modify allDat itself...)
-		allDat.setDateVals(getChoices(dateFormat, allDat.getDateVals(), mapLoc, allDat.getTextVals().get(0),
-				allDat.getTextVals().get(2)));
-		
+		decisions thCh = new decisions(null, colDefs, tempFilename);
+		getChoices(dateFormat, allDat.dateVals, mapLoc, allDat.textVals[0]);
+
 		if (DEBUG) {
 			src.debug.printFilename(filename);
 			src.debug.printDates(allDat.getDateVals(), dateFormat);
