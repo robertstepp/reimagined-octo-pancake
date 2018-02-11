@@ -425,9 +425,7 @@ public class Ross {
 		String mapLoc = "src/beat-map-2.png";
 		String delimiter = ",";
 		String dateFormat = "MM/dd/yyyy";
-		// Here's our representation of which beats are in which precinct.
-		// Ideally we'd be pulling this from the records, probably won't have
-		// time to implement
+		// Beats are within precincts (we're ignoring sectors)
 		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
 		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3", "N1", "N2", "N3", "U1", "U2", "U3" };
 		pb.put("N", n);
@@ -439,13 +437,12 @@ public class Ross {
 		pb.put("SE", se);
 		String[] sw = { "F1", "F2", "F3", "W1", "W2", "W3" };
 		pb.put("SW", sw);
-		// Same structure for classes of crime as far precinct
-		// membership
+		// Two general classes of crime
 		LinkedHashMap<String, String[]> cc = new LinkedHashMap<String, String[]>();
 		String[] crimeClasses = { "Person", "Property" };
 		String[] persCrim = { "Homicide", "Rape", "Robbery", "Aggravated Assault" }; // TODO:
 																						// Is
-																						// aggr.
+																						// aggravated
 																						// assault
 																						// showing
 																						// up
