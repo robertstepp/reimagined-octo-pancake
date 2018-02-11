@@ -1,3 +1,4 @@
+// Java Program by Ross Hemphill & Robert Stepp 02/11/2018
 package src;
 
 import java.awt.Image;

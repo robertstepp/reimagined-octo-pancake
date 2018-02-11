@@ -1,3 +1,4 @@
+// Java Program by Ross Hemphill & Robert Stepp 02/11/2018
 package src;
 
 import java.util.ArrayList;
@@ -26,14 +27,16 @@ public class selecARec {
 	}
 
 	/**
-	 * @param beatRecs the beatRecs to set
+	 * @param beatRecs
+	 *            the beatRecs to set
 	 */
 	public void setBeatRecs(ArrayList<String[]> beatRecs) {
 		this.beatRecs = beatRecs;
 	}
 
 	/**
-	 * @param precRecs the precRecs to set
+	 * @param precRecs
+	 *            the precRecs to set
 	 */
 	public void setPrecRecs(ArrayList<String[]> precRecs) {
 		this.precRecs = precRecs;

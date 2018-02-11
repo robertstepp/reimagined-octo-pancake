@@ -1,3 +1,4 @@
+// Java Program by Ross Hemphill & Robert Stepp 02/11/2018
 package src;
 
 import java.time.LocalDate;
@@ -20,7 +21,8 @@ public class options {
 	Map<String, String[]> bpAs = new LinkedHashMap<String, String[]>();
 	String[] tyOp;
 
-	options(LocalDate[] daRn, String[] beOp, String[] prOp, LinkedHashMap<String, String[]> bpAs, String[] tyOp) {
+	options(LocalDate[] daRn, String[] beOp, String[] prOp,
+			LinkedHashMap<String, String[]> bpAs, String[] tyOp) {
 		this.daRn = daRn;
 		this.beOp = beOp;
 		this.prOp = prOp;

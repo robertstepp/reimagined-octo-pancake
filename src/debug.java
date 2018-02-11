@@ -1,3 +1,4 @@
+// Java Program by Ross Hemphill & Robert Stepp 02/11/2018
 package src;
 
 import java.time.LocalDate;
@@ -45,7 +46,8 @@ public class debug {
 	 */
 	public static void printDates(LocalDate mydate, String format) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-		System.out.println("DATE PASSED (" + format + "): \t" + mydate.format(formatter));
+		System.out.println(
+				"DATE PASSED (" + format + "): \t" + mydate.format(formatter));
 	}
 
 	/**
@@ -91,15 +93,16 @@ public class debug {
 	 * @param special
 	 *            Boolean value doesn't matter
 	 */
-	public static void printArray(ArrayList<String[]> outtie, String delim, boolean special) {
+	public static void printArray(ArrayList<String[]> outtie, String delim,
+			boolean special) {
 		// TODO: Either add ranges as a param, or remove "j" conditionals when
 		// done testing
-		//int j = 0;
+		// int j = 0;
 		System.out.println("SOME OF ARRAYLIST<STRING[]> PASSED:");
 		for (String[] innie : outtie) {
-			//if ((j < 3) || (j > outtie.size() - 4))
-				printArray(innie, delim);
-			//++j;
+			// if ((j < 3) || (j > outtie.size() - 4))
+			printArray(innie, delim);
+			// ++j;
 		}
 	}
 }

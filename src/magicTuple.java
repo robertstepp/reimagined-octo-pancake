@@ -1,3 +1,4 @@
+// Java Program by Ross Hemphill & Robert Stepp 02/11/2018
 package src;
 
 import java.time.LocalDate;
@@ -13,7 +14,8 @@ class magicTuple {
 	LocalDate[] dateVals = new LocalDate[2];
 	ArrayList<String[]> theRecs = new ArrayList<String[]>();
 
-	magicTuple(int[] colPos, ArrayList<String[]> textVals, LocalDate[] dateVals, ArrayList<String[]> theRecs) {
+	magicTuple(int[] colPos, ArrayList<String[]> textVals, LocalDate[] dateVals,
+			ArrayList<String[]> theRecs) {
 		this.colPos = colPos;
 		this.textVals = textVals;
 		this.dateVals = dateVals;
