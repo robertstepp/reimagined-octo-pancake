@@ -385,10 +385,12 @@ public class WeGotDaBeat {
 	 */
 	public static String getTypeOfCrime(String[] types) {
 		JPanel tPanel = new JPanel();
+		
 		JComboBox<?> type = new JComboBox<Object>(types);
 		tPanel.add(new JLabel("Type requested:"));
 		tPanel.add(type);
-		JOptionPane.showConfirmDialog(null, tPanel, "Enter requested type:", JOptionPane.OK_CANCEL_OPTION);
+		
+		JOptionPane.showConfirmDialog(null, tPanel, "Enter requested type:", JOptionPane.DEFAULT_OPTION);
 		return types[type.getSelectedIndex()];
 	}
 
