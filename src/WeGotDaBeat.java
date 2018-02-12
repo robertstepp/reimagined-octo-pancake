@@ -648,6 +648,11 @@ public class WeGotDaBeat {
 		return ita;
 	}
 
+	public static void displayRecs(LinkedHashMap<String, Integer> listOfCrimeScores, String key) {
+
+		System.out.printf("%s: %d instances\n", key, listOfCrimeScores.get(key));
+	}
+
 	///////
 	///////
 	public static void main(String[] args) throws IOException {
@@ -682,17 +687,6 @@ public class WeGotDaBeat {
 		// ("Table 11. First releases from state prison, 2009: Sentence length
 		// and time served in prison, by offense and race")
 		// https://www.geeksforgeeks.org/pair-class-in-java/
-		// ArrayList<Pair<String, Integer>> crSev = new ArrayList<Pair<String,
-		// Integer>>();
-		// crSev.add(new Pair<String, Integer>("Homicide", 119));
-		// crSev.add(new Pair<String, Integer>("Rape", 96));
-		// crSev.add(new Pair<String, Integer>("Robbery", 52));
-		// crSev.add(new Pair<String, Integer>("Assault", 31));
-		// crSev.add(new Pair<String, Integer>("Arson", 38));
-		// crSev.add(new Pair<String, Integer>("Burglary", 26));
-		// crSev.add(new Pair<String, Integer>("Larceny-Theft", 17));
-		// crSev.add(new Pair<String, Integer>("Motor Vehicle Theft", 19));
-
 		LinkedHashMap<String, Integer> myMap = new LinkedHashMap<String, Integer>();
 		myMap.put("Homicide", 119);
 		myMap.put("Rape", 96);
@@ -702,7 +696,6 @@ public class WeGotDaBeat {
 		myMap.put("Burglary", 26);
 		myMap.put("Larceny-Theft", 17);
 		myMap.put("Motor Vehicle Theft", 19);
-
 		////
 		final boolean DEBUG = false;
 		////
@@ -725,8 +718,24 @@ public class WeGotDaBeat {
 
 		// HACK 0=person!
 		int crCl = 0;
-		int beatOrPrec = 0;
-		cntOcc(myMap, chosenOness, colDefs, crCl, beatOrPrec);
+		if (thCh.tyCh.equals("Property"))
+			crCl = 1;
+
+		LinkedHashMap<String, Integer> beatWeigOcc = new LinkedHashMap<String, Integer>();
+		beatWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 0);
+		String key;
+		for (Map.Entry<String, Integer> entr : beatWeigOcc.entrySet()) {
+			key = entr.getKey();
+			displayRecs(beatWeigOcc, key);
+		}
+
+		LinkedHashMap<String, Integer> precWeigOcc = new LinkedHashMap<String, Integer>();
+		precWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 1);
+		key = "";
+		for (Map.Entry<String, Integer> entr : precWeigOcc.entrySet()) {
+			key = entr.getKey();
+			displayRecs(precWeigOcc, key);
+		}
 
 		if (DEBUG) {
 			System.out.println("###INITIAL###");
