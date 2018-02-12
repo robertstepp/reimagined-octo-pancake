@@ -300,14 +300,14 @@ public class WeGotDaBeat {
 			JOptionPane.showConfirmDialog(null, dPanel, "Timeframe of interest", JOptionPane.DEFAULT_OPTION);
 
 			try {
-				System.out.println("Begin choice: " + beginChoice.getText());
+//				System.out.println("Begin choice: " + beginChoice.getText());
 				datesChosen[0] = LocalDate.parse(beginChoice.getText(), formatter);
 			} catch (Exception e) {
 				begParsFailed = true;
 				anyParsFailed = true;
 			}
 			try {
-				System.out.println("End choice: " + endChoice.getText());
+//				System.out.println("End choice: " + endChoice.getText());
 				datesChosen[1] = LocalDate.parse(endChoice.getText(), formatter);
 			} catch (Exception e) {
 				endParsFailed = true;
@@ -315,7 +315,7 @@ public class WeGotDaBeat {
 			}
 
 			if (datesChosen[0].isAfter(datesChosen[1]))
-				System.out.println("eETKLSJTLEIH");
+				System.out.println("That's not proper!");
 			if (anyParsFailed) {
 				if (begParsFailed && endParsFailed) {
 					JOptionPane.showConfirmDialog(null, "Unparseable dates.\nPlease enter in the format " + dateForm,
