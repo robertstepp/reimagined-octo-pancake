@@ -51,8 +51,6 @@ public class WeGotDaBeat {
 
 	/////// 2nd
 	/**
-	 * TODO: Update method documentation
-	 * 
 	 * structFromStream takes filepath, delimiter, date format, and column
 	 * keywords of interest. In return, it provides an ArrayList whose
 	 * first-dimension elements are: 0) the indices of columns of interest 1)
@@ -68,15 +66,13 @@ public class WeGotDaBeat {
 	 * @param cols
 	 *            String[] containing textual column definitions (from the
 	 *            header)
-	 * @return An ArrayList of Objects, each of which are super-fun themselves
+	 * @return A magicTuple with column positions, all values found in certain fields, range of dates represented, and delimiter split rows
 	 * @throws IOException
 	 */
 	public static magicTuple structFromStream(String file, String del, String daFo, String[] cols) throws IOException {
 		// The columnar positions of the fields we're recording possible values
 		// for
 		// Index [0=beat, 1=sector, 2=precinct, 3=date]
-		// TODO: This is hardcoded and would probably be more appropriately
-		// represented by a linked list or something
 		int[] whichCol = { -1, -1, -1, -1 };
 		// Assumption: first column containing any occurrence of the keyword is
 		// the one we want
