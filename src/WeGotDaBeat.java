@@ -300,14 +300,14 @@ public class WeGotDaBeat {
 			JOptionPane.showConfirmDialog(null, dPanel, "Timeframe of interest", JOptionPane.DEFAULT_OPTION);
 
 			try {
-//				System.out.println("Begin choice: " + beginChoice.getText());
+				// System.out.println("Begin choice: " + beginChoice.getText());
 				datesChosen[0] = LocalDate.parse(beginChoice.getText(), formatter);
 			} catch (Exception e) {
 				begParsFailed = true;
 				anyParsFailed = true;
 			}
 			try {
-//				System.out.println("End choice: " + endChoice.getText());
+				// System.out.println("End choice: " + endChoice.getText());
 				datesChosen[1] = LocalDate.parse(endChoice.getText(), formatter);
 			} catch (Exception e) {
 				endParsFailed = true;
@@ -650,7 +650,7 @@ public class WeGotDaBeat {
 
 	public static void displayRecs(LinkedHashMap<String, Integer> listOfCrimeScores, String key) {
 
-		System.out.printf("%s: %d instances\n", key, listOfCrimeScores.get(key));
+		System.out.printf("%-10s: %d instances\n", key, listOfCrimeScores.get(key));
 	}
 
 	///////
@@ -721,6 +721,7 @@ public class WeGotDaBeat {
 		if (thCh.tyCh.equals("Property"))
 			crCl = 1;
 
+		System.out.println("The occurences of incidents within your chosen beat:");
 		LinkedHashMap<String, Integer> beatWeigOcc = new LinkedHashMap<String, Integer>();
 		beatWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 0);
 		String key;
@@ -728,7 +729,9 @@ public class WeGotDaBeat {
 			key = entr.getKey();
 			displayRecs(beatWeigOcc, key);
 		}
+		System.out.println();
 
+		System.out.println("Compared to across the whole precinct:");
 		LinkedHashMap<String, Integer> precWeigOcc = new LinkedHashMap<String, Integer>();
 		precWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 1);
 		key = "";
@@ -736,6 +739,9 @@ public class WeGotDaBeat {
 			key = entr.getKey();
 			displayRecs(precWeigOcc, key);
 		}
+		System.out.println();
+
+		System.out.println("Good luck with your choice, and thanks for utilizing our service!");
 
 		if (DEBUG) {
 			System.out.println("###INITIAL###");
