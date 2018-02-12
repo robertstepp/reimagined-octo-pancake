@@ -650,7 +650,7 @@ public class WeGotDaBeat {
 
 	public static void displayRecs(LinkedHashMap<String, Integer> listOfCrimeScores, String key) {
 
-		System.out.printf("%-10s: %d instances\n", key, listOfCrimeScores.get(key));
+		System.out.printf("%-10s: %d crime prevalence\n", key, listOfCrimeScores.get(key));
 	}
 
 	///////
