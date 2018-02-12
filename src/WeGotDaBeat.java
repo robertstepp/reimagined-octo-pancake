@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,9 +39,10 @@ public class WeGotDaBeat {
 		JTextField preFilename = new JTextField();
 		preFilename.setText(filename);
 		JPanel inputFilename = new JPanel();
-		inputFilename.add(new JLabel("Filename: (Case Sensitive)"));
+		inputFilename.add(new JLabel("Filename: (case sensitive)"));
 		inputFilename.add(preFilename);
-		JOptionPane.showConfirmDialog(null, inputFilename, "Please Enter Filename:", JOptionPane.DEFAULT_OPTION);
+		JOptionPane.showConfirmDialog(null, inputFilename, "Comma Separated Values file (.csv)",
+				JOptionPane.DEFAULT_OPTION);
 		String tempFilename = preFilename.getText();
 		if (tempFilename.length() > 0)
 			filename = tempFilename;
@@ -266,51 +268,61 @@ public class WeGotDaBeat {
 	public static LocalDate[] getDateRange(String dateForm, LocalDate[] dateLims) {
 		LocalDate[] datesChosen = new LocalDate[2];
 		datesChosen[0] = LocalDate.now();
-		datesChosen[1] = LocalDate.of(1900, 1, 1);
+		datesChosen[1] = LocalDate.now();
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateForm);
-		boolean validRange = false;
-		boolean dateFail = false;
-		while (!validRange) {
-			if (dateFail == true) {
-				JOptionPane.showConfirmDialog(null, "Incorrect Date Range.\nPlease ensure correct date range entered.",
-						"Error", JOptionPane.DEFAULT_OPTION);
-			}
+		String[] dateLimsS = new String[2];
+		dateLimsS[0] = dateLims[0].format(formatter);
+		dateLimsS[1] = dateLims[1].format(formatter);
+
+		boolean validBeg = false, validEnd = false;
+		while (!(validBeg && validEnd)) {
 			JPanel dPanel = new JPanel();
 			dPanel.add(new JLabel("Beginning date:"));
 			JTextField beginChoice = new JTextField();
-			beginChoice.setText(dateLims[0].format(formatter));
+			beginChoice.setText(dateLimsS[0]);
 			dPanel.add(beginChoice);
-
 			dPanel.add(new JLabel("Ending date:"));
 			JTextField endChoice = new JTextField();
-			endChoice.setText(dateLims[1].format(formatter));
+			endChoice.setText(dateLimsS[1]);
 			dPanel.add(endChoice);
 
-			JOptionPane.showConfirmDialog(null, dPanel, "Please enter date range of interest:",
-					JOptionPane.DEFAULT_OPTION);
-
-			// Two nested conditions ensure that neither entry is blank and each
-			// contains "/". This is hardcoded and it would be better to handle
-			// the exception. (B/C infinite other unparseable input possible)
-			if (!((beginChoice.getText().equals("")) || (endChoice.getText().equals("")))) {
-				// if ((beginChoice.getText().contains("/")) &&
-				// (beginChoice.getText().contains("/"))) {
-				if ((beginChoice.getText().contains("/")) && (endChoice.getText().contains("/"))) {
-					datesChosen[0] = LocalDate.parse(beginChoice.getText(), formatter);
-					datesChosen[1] = LocalDate.parse(endChoice.getText(), formatter);
-					if (!((datesChosen[0].isBefore(dateLims[0]) || (datesChosen[1].isAfter(dateLims[1])))
-							|| (datesChosen[0].isAfter(datesChosen[1]))))
-						validRange = true;
-				}
-			} else {
-				// If no entry, assume whole range is desired
+			JOptionPane.showConfirmDialog(null, dPanel, "Timeframe of interest", JOptionPane.DEFAULT_OPTION);
+			// Blank=default
+			if (beginChoice.getText().equals("") || beginChoice.getText().equals(dateLimsS[0])) {
 				datesChosen[0] = dateLims[0];
-				datesChosen[1] = dateLims[1];
-				validRange = true;
+				validBeg = true;
 			}
-			if (validRange == false)
-				dateFail = true;
+			if (endChoice.getText().equals("") || endChoice.getText().equals(dateLimsS[1])) {
+				datesChosen[1] = dateLims[1];
+				validEnd = true;
+			}
+			if (!validBeg) {
+				try {
+					datesChosen[0] = LocalDate.parse(beginChoice.getText(), formatter);
+				} catch (Exception e) {
+				}
+			}
+			if (!validEnd) {
+				try {
+					datesChosen[1] = LocalDate.parse(endChoice.getText(), formatter);
+				} catch (Exception e) {
+				}
+			}
+			if (!datesChosen[0].isBefore(dateLims[0]))
+				validBeg = true;
+			if (!datesChosen[1].isAfter(dateLims[1]))
+				validEnd = true;
+			if (datesChosen[0].isAfter(datesChosen[1])) {
+				validBeg = false;
+				validEnd = false;
+			}
+			if (!validBeg)
+				JOptionPane.showConfirmDialog(null, "Invalid beginning date.\nPlease enter a viable range.", "Error",
+						JOptionPane.DEFAULT_OPTION);
+			if (!validEnd)
+				JOptionPane.showConfirmDialog(null, "Invalid ending date.\nPlease enter a viable range.", "Error",
+						JOptionPane.DEFAULT_OPTION);
 		}
 		return datesChosen;
 	}
@@ -364,7 +376,7 @@ public class WeGotDaBeat {
 			bpPanel.add(new JLabel("Beat:"));
 			bpPanel.add(be);
 
-			JOptionPane.showConfirmDialog(null, bpPanel, "Please choose a precinct and a beat within it:",
+			JOptionPane.showConfirmDialog(null, bpPanel, "Area of interest (Beat must be within precinct)",
 					JOptionPane.DEFAULT_OPTION);
 
 			bc = theBeats[be.getSelectedIndex()];
@@ -385,12 +397,12 @@ public class WeGotDaBeat {
 	 */
 	public static String getTypeOfCrime(String[] types) {
 		JPanel tPanel = new JPanel();
-		
+
 		JComboBox<?> type = new JComboBox<Object>(types);
 		tPanel.add(new JLabel("Type requested:"));
 		tPanel.add(type);
-		
-		JOptionPane.showConfirmDialog(null, tPanel, "Enter requested type:", JOptionPane.DEFAULT_OPTION);
+
+		JOptionPane.showConfirmDialog(null, tPanel, "Crime class of interest", JOptionPane.DEFAULT_OPTION);
 		return types[type.getSelectedIndex()];
 	}
 
