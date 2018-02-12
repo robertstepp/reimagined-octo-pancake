@@ -721,7 +721,10 @@ public class WeGotDaBeat {
 		if (thCh.tyCh.equals("Property"))
 			crCl = 1;
 
-		System.out.println("The occurences of incidents within your chosen beat:");
+		System.out.println("Below follows data to assist you in determining the suitability of different areas for locating. " + 
+		"The more severe the crime, the greater an impact a single occurrence has. We follow the methodology established by the Pew Charitable Trusts.");
+		System.out.println();
+		System.out.println("The weighted significances of criminal occurences within your chosen beat and timeframe:");
 		LinkedHashMap<String, Integer> beatWeigOcc = new LinkedHashMap<String, Integer>();
 		beatWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 0);
 		String key;
@@ -731,7 +734,7 @@ public class WeGotDaBeat {
 		}
 		System.out.println();
 
-		System.out.println("Compared to across the whole precinct:");
+		System.out.println("Compared to the same measure across the whole precinct:");
 		LinkedHashMap<String, Integer> precWeigOcc = new LinkedHashMap<String, Integer>();
 		precWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 1);
 		key = "";
