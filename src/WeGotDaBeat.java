@@ -14,7 +14,10 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -23,6 +26,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import javafx.util.Pair;
 
 public class WeGotDaBeat {
 	/////// 1st stage
@@ -267,62 +272,88 @@ public class WeGotDaBeat {
 	 */
 	public static LocalDate[] getDateRange(String dateForm, LocalDate[] dateLims) {
 		LocalDate[] datesChosen = new LocalDate[2];
-		datesChosen[0] = LocalDate.now();
-		datesChosen[1] = LocalDate.now();
-
+		datesChosen[0] = LocalDate.MAX;
+		datesChosen[1] = LocalDate.MIN;
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateForm);
 		String[] dateLimsS = new String[2];
-		dateLimsS[0] = dateLims[0].format(formatter);
-		dateLimsS[1] = dateLims[1].format(formatter);
+		boolean allIsWell = false;
+		while (!allIsWell) {
+			boolean begParsFailed = false, endParsFailed = false;
+			boolean anyParsFailed = false;
+			boolean begInRng = false, endInRng = false;
+			boolean begAfterEnd = true;
 
-		boolean validBeg = false, validEnd = false;
-		while (!(validBeg && validEnd)) {
 			JPanel dPanel = new JPanel();
+
 			dPanel.add(new JLabel("Beginning date:"));
 			JTextField beginChoice = new JTextField();
+			dateLimsS[0] = dateLims[0].format(formatter);
 			beginChoice.setText(dateLimsS[0]);
 			dPanel.add(beginChoice);
+
 			dPanel.add(new JLabel("Ending date:"));
 			JTextField endChoice = new JTextField();
+			dateLimsS[1] = dateLims[1].format(formatter);
 			endChoice.setText(dateLimsS[1]);
 			dPanel.add(endChoice);
 
 			JOptionPane.showConfirmDialog(null, dPanel, "Timeframe of interest", JOptionPane.DEFAULT_OPTION);
-			// Blank=default
-			if (beginChoice.getText().equals("") || beginChoice.getText().equals(dateLimsS[0])) {
-				datesChosen[0] = dateLims[0];
-				validBeg = true;
+
+			try {
+				System.out.println("Begin choice: " + beginChoice.getText());
+				datesChosen[0] = LocalDate.parse(beginChoice.getText(), formatter);
+			} catch (Exception e) {
+				begParsFailed = true;
+				anyParsFailed = true;
 			}
-			if (endChoice.getText().equals("") || endChoice.getText().equals(dateLimsS[1])) {
-				datesChosen[1] = dateLims[1];
-				validEnd = true;
+			try {
+				System.out.println("End choice: " + endChoice.getText());
+				datesChosen[1] = LocalDate.parse(endChoice.getText(), formatter);
+			} catch (Exception e) {
+				endParsFailed = true;
+				anyParsFailed = true;
 			}
-			if (!validBeg) {
-				try {
-					datesChosen[0] = LocalDate.parse(beginChoice.getText(), formatter);
-				} catch (Exception e) {
+
+			if (datesChosen[0].isAfter(datesChosen[1]))
+				System.out.println("eETKLSJTLEIH");
+			if (anyParsFailed) {
+				if (begParsFailed && endParsFailed) {
+					JOptionPane.showConfirmDialog(null, "Unparseable dates.\nPlease enter in the format " + dateForm,
+							"Error", JOptionPane.DEFAULT_OPTION);
+				} else {
+					if (begParsFailed)
+						JOptionPane.showConfirmDialog(null,
+								"Unparseable beginning date.\nPlease enter in the format " + dateForm, "Error",
+								JOptionPane.DEFAULT_OPTION);
+					else if (endParsFailed)
+						JOptionPane.showConfirmDialog(null,
+								"Unparseable ending date.\nPlease enter in the format " + dateForm, "Error",
+								JOptionPane.DEFAULT_OPTION);
 				}
+			} else {
+				if (!datesChosen[0].isBefore(dateLims[0]))
+					begInRng = true;
+				else
+					JOptionPane.showConfirmDialog(null,
+							"Beginning date too early.\nCan't be earlier than " + dateLimsS[0] + ".", "Error",
+							JOptionPane.DEFAULT_OPTION);
+				if (!datesChosen[1].isAfter(dateLims[1]))
+					endInRng = true;
+				else
+					JOptionPane.showConfirmDialog(null,
+							"Beginning date too late.\nCan't be later than " + dateLimsS[1] + ".", "Error",
+							JOptionPane.DEFAULT_OPTION);
+				if (!datesChosen[0].equals(LocalDate.MAX))
+					if (!datesChosen[1].equals(LocalDate.MIN))
+						if (!datesChosen[0].isAfter(datesChosen[1]))
+							begAfterEnd = false;
+						else
+							JOptionPane.showConfirmDialog(null, "Dates are in reversed order.", "Error",
+									JOptionPane.DEFAULT_OPTION);
 			}
-			if (!validEnd) {
-				try {
-					datesChosen[1] = LocalDate.parse(endChoice.getText(), formatter);
-				} catch (Exception e) {
-				}
-			}
-			if (!datesChosen[0].isBefore(dateLims[0]))
-				validBeg = true;
-			if (!datesChosen[1].isAfter(dateLims[1]))
-				validEnd = true;
-			if (datesChosen[0].isAfter(datesChosen[1])) {
-				validBeg = false;
-				validEnd = false;
-			}
-			if (!validBeg)
-				JOptionPane.showConfirmDialog(null, "Invalid beginning date.\nPlease enter a viable range.", "Error",
-						JOptionPane.DEFAULT_OPTION);
-			if (!validEnd)
-				JOptionPane.showConfirmDialog(null, "Invalid ending date.\nPlease enter a viable range.", "Error",
-						JOptionPane.DEFAULT_OPTION);
+			if (begInRng && endInRng)
+				if (!(begAfterEnd || anyParsFailed))
+					allIsWell = true;
 		}
 		return datesChosen;
 	}
@@ -448,6 +479,28 @@ public class WeGotDaBeat {
 		return recBag;
 	}
 
+	// https://stackoverflow.com/questions/29920027/how-can-i-sort-a-list-of-pairstring-integer
+	private static void countOcc(LinkedHashMap<String, Integer> crSev, selecARec arealOcc, String[] whichCol) {
+		ArrayList<String[]> beatRecs = arealOcc.beatRecs;
+		ArrayList<String[]> precRecs = arealOcc.precRecs;
+
+		LinkedHashMap<String, Integer> weightOccBeat = new LinkedHashMap<String, Integer>();
+		LinkedHashMap<String, Integer> weightOccPrec = new LinkedHashMap<String, Integer>();
+
+		String crTyp = "";
+		int defineWeight = 0;
+		int existScore = 0;
+		int thisRecScore = 0;
+		for (String[] rec : beatRecs) {
+			String recCrimeType = rec[1];
+			 defineWeight = crSev.get(recCrimeType);
+			System.out.println("" + defineWeight + "\t" + rec[7] + "\t" + rec[3]);
+		existScore=weightOccBeat.get(recCrimeType);
+		thisre
+			weightOccBeat.put(recCrime, (existScore + ())
+		}
+	}
+
 	///////
 	///////
 	public static void main(String[] args) throws IOException {
@@ -475,8 +528,35 @@ public class WeGotDaBeat {
 		cc.put(crimeClasses[0], persCrim);
 		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft" };
 		cc.put(crimeClasses[1], propCrim);
+		// Proportionate severity per crime
+		// See
+		// http://www.pewtrusts.org/en/research-and-analysis/issue-briefs/2016/03/the-punishment-rate
+		// and https://www.bjs.gov/index.cfm?ty=pbdetail&iid=2045
+		// ("Table 11. First releases from state prison, 2009: Sentence length
+		// and time served in prison, by offense and race")
+		// https://www.geeksforgeeks.org/pair-class-in-java/
+		ArrayList<Pair<String, Integer>> crSev = new ArrayList<Pair<String, Integer>>();
+		crSev.add(new Pair<String, Integer>("Homicide", 119));
+		crSev.add(new Pair<String, Integer>("Rape", 96));
+		crSev.add(new Pair<String, Integer>("Robbery", 52));
+		crSev.add(new Pair<String, Integer>("Assault", 31));
+		crSev.add(new Pair<String, Integer>("Arson", 38));
+		crSev.add(new Pair<String, Integer>("Burglary", 26));
+		crSev.add(new Pair<String, Integer>("Larceny-Theft", 17));
+		crSev.add(new Pair<String, Integer>("Motor Vehicle Theft", 19));
+
+		LinkedHashMap<String, Integer> myMap = new LinkedHashMap<String, Integer>();
+		myMap.put("Homicide", 119);
+		myMap.put("Rape", 96);
+		myMap.put("Robbery", 52);
+		myMap.put("Assault", 31);
+		myMap.put("Arson", 38);
+		myMap.put("Burglary", 26);
+		myMap.put("Larceny-Theft", 17);
+		myMap.put("Motor Vehicle Theft", 19);
+
 		////
-		final boolean DEBUG = true;
+		final boolean DEBUG = false;
 		////
 
 		// BEGIN user interaction
@@ -494,6 +574,7 @@ public class WeGotDaBeat {
 		// Choices made, we can now cull our records
 		selecARec chosenOness = cullRecords(allDat, thCh, dateFormat, cc);
 		// END user interaction
+		countOcc(myMap, chosenOness, colDefs);
 
 		if (DEBUG) {
 			System.out.println("###INITIAL###");
