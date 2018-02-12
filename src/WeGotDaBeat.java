@@ -480,25 +480,172 @@ public class WeGotDaBeat {
 	}
 
 	// https://stackoverflow.com/questions/29920027/how-can-i-sort-a-list-of-pairstring-integer
-	private static void countOcc(LinkedHashMap<String, Integer> crSev, selecARec arealOcc, String[] whichCol) {
+	private static void countOcc(LinkedHashMap<String, Integer> crSev, selecARec arealOcc, String[] whichCol,
+			int crCl) {
 		ArrayList<String[]> beatRecs = arealOcc.beatRecs;
 		ArrayList<String[]> precRecs = arealOcc.precRecs;
 
 		LinkedHashMap<String, Integer> weightOccBeat = new LinkedHashMap<String, Integer>();
 		LinkedHashMap<String, Integer> weightOccPrec = new LinkedHashMap<String, Integer>();
 
-		String crTyp = "";
-		int defineWeight = 0;
-		int existScore = 0;
-		int thisRecScore = 0;
+		// Person is crCl=0
+		weightOccBeat.put("Homicide", 0);
+		weightOccBeat.put("Rape", 0);
+		weightOccBeat.put("Robbery", 0);
+		weightOccBeat.put("Assault", 0);
+		weightOccPrec.put("Homicide", 0);
+		weightOccPrec.put("Rape", 0);
+		weightOccPrec.put("Robbery", 0);
+		weightOccPrec.put("Assault", 0);
+		// Property is 1
+		weightOccBeat.put("Arson", 0);
+		weightOccBeat.put("Burglary", 0);
+		weightOccBeat.put("Larceny-Theft", 0);
+		weightOccBeat.put("Motor Vehicle Theft", 0);
+		weightOccPrec.put("Arson", 0);
+		weightOccPrec.put("Burglary", 0);
+		weightOccPrec.put("Larceny-Theft", 0);
+		weightOccPrec.put("Motor Vehicle Theft", 0);
+
+		int definedWeight = 0;
+		int recOccs = 0;
+
+		int existTyScore = 0;
+		int newTyScore = 0;
+		// String recOccT = "";
+		// String recNum = "";
+		String recCrimeType = "";
 		for (String[] rec : beatRecs) {
-			String recCrimeType = rec[1];
-			 defineWeight = crSev.get(recCrimeType);
-			System.out.println("" + defineWeight + "\t" + rec[7] + "\t" + rec[3]);
-		existScore=weightOccBeat.get(recCrimeType);
-		thisre
-			weightOccBeat.put(recCrime, (existScore + ())
+			// recNum = rec[7];
+			// recOccT = rec[3];
+			//
+			//
+			// System.out.println("" + definedWeight + "\t" + recNum + "\t" +
+			// recOccT);
+
+			recCrimeType = rec[1];
+
+			existTyScore = weightOccBeat.get(rec[1]);
+			newTyScore = existTyScore + (recOccs * definedWeight);
+			System.out.println(recCrimeType + "\t\t" + newTyScore);
+			definedWeight = crSev.get(recCrimeType);
+			recOccs = Integer.parseInt(rec[3]);
+			weightOccBeat.put(recCrimeType, weightOccBeat.get(recCrimeType) + (recOccs * definedWeight));
 		}
+	}
+
+	/**
+	 * 
+	 * @param crSev
+	 * @param records
+	 * @param whichCol
+	 * @param pePr
+	 *            If 0 return person, if else return property
+	 * @param bePr
+	 *            If 0, return beat, if else return precinct
+	 */
+	private static LinkedHashMap<String, Integer> cntOcc(LinkedHashMap<String, Integer> crSev, selecARec records,
+			String[] whichCol, int pePr, int bePr) {
+		boolean deb = false;
+		LinkedHashMap<String, Integer> ita = new LinkedHashMap<String, Integer>();
+		if (bePr == 0) {
+			ArrayList<String[]> beatRecs = records.beatRecs;
+			LinkedHashMap<String, Integer> beatOcc = new LinkedHashMap<String, Integer>();
+			if (pePr == 0) {
+				beatOcc.put("Homicide", 0);
+				beatOcc.put("Rape", 0);
+				beatOcc.put("Robbery", 0);
+				beatOcc.put("Assault", 0);
+			} else {
+				beatOcc.put("Burglary", 0);
+				beatOcc.put("Larceny-Theft", 0);
+				beatOcc.put("Motor Vehicle Theft", 0);
+			}
+			int prevOcc = 0;
+			int nowOcc = 0;
+			// int totOcc = 0;
+			String crimeType = "";
+			for (String[] rec : beatRecs) {
+				crimeType = rec[1];
+				prevOcc = beatOcc.get(crimeType);
+				if (deb) {
+					System.out.print(crimeType + "\t");
+					System.out.println("Prior to now, this many accumed:" + prevOcc);
+				}
+				nowOcc = Integer.parseInt(rec[3]);
+				if (deb)
+					System.out.println("This many occ now: " + nowOcc);
+				beatOcc.put(crimeType, (prevOcc + nowOcc));
+				nowOcc = beatOcc.get(crimeType);
+				if (deb)
+					System.out.println("Adding up: " + nowOcc);
+			}
+			int tval = 0;
+			int value = 0;
+			String key = "";
+			int wval = 0;
+			// https://stackoverflow.com/questions/12310914/how-to-iterate-through-linkedhashmap-with-lists-as-values
+			for (Map.Entry<String, Integer> entry : beatOcc.entrySet()) {
+				key = entry.getKey();
+				value = entry.getValue();
+				tval = crSev.get(key);
+				wval = tval * value;
+				beatOcc.put(key, wval);
+				if (deb)
+					System.out.println(tval + "\t" + value + "\t" + beatOcc.get(key));
+			}
+			ita = beatOcc;
+		} else {
+			ArrayList<String[]> precRecs = records.precRecs;
+			LinkedHashMap<String, Integer> precOcc = new LinkedHashMap<String, Integer>();
+			if (pePr == 0) {
+				precOcc.put("Homicide", 0);
+				precOcc.put("Rape", 0);
+				precOcc.put("Robbery", 0);
+				precOcc.put("Assault", 0);
+			} else {
+				precOcc.put("Burglary", 0);
+				precOcc.put("Larceny-Theft", 0);
+				precOcc.put("Motor Vehicle Theft", 0);
+			}
+			int prevOcc = 0;
+			int nowOcc = 0;
+			// int totOcc = 0;
+			String crimeType = "";
+			for (String[] rec : precRecs) {
+				crimeType = rec[1];
+				prevOcc = precOcc.get(crimeType);
+				if (deb) {
+					System.out.print(crimeType + "\t");
+					System.out.println("Prior to now, this many accumed:" + prevOcc);
+				}
+				nowOcc = Integer.parseInt(rec[3]);
+				if (deb)
+					System.out.println("This many occ now: " + nowOcc);
+				precOcc.put(crimeType, (prevOcc + nowOcc));
+				nowOcc = precOcc.get(crimeType);
+				if (deb)
+					System.out.println("Adding up: " + nowOcc);
+			}
+			int tval = 0;
+			int value = 0;
+			String key = "";
+			int wval = 0;
+			// https://stackoverflow.com/questions/12310914/how-to-iterate-through-linkedhashmap-with-lists-as-values
+			for (Map.Entry<String, Integer> entr : precOcc.entrySet()) {
+				key = entr.getKey();
+				value = entr.getValue();
+				tval = crSev.get(key);
+				wval = tval * value;
+				precOcc.put(key, wval);
+				if (deb)
+					System.out.println(tval + "\t" + value + "\t" + precOcc.get(key));
+			}
+			ita = precOcc;
+		}
+		if (deb)
+			System.out.println("END");
+		return ita;
 	}
 
 	///////
@@ -535,15 +682,16 @@ public class WeGotDaBeat {
 		// ("Table 11. First releases from state prison, 2009: Sentence length
 		// and time served in prison, by offense and race")
 		// https://www.geeksforgeeks.org/pair-class-in-java/
-		ArrayList<Pair<String, Integer>> crSev = new ArrayList<Pair<String, Integer>>();
-		crSev.add(new Pair<String, Integer>("Homicide", 119));
-		crSev.add(new Pair<String, Integer>("Rape", 96));
-		crSev.add(new Pair<String, Integer>("Robbery", 52));
-		crSev.add(new Pair<String, Integer>("Assault", 31));
-		crSev.add(new Pair<String, Integer>("Arson", 38));
-		crSev.add(new Pair<String, Integer>("Burglary", 26));
-		crSev.add(new Pair<String, Integer>("Larceny-Theft", 17));
-		crSev.add(new Pair<String, Integer>("Motor Vehicle Theft", 19));
+		// ArrayList<Pair<String, Integer>> crSev = new ArrayList<Pair<String,
+		// Integer>>();
+		// crSev.add(new Pair<String, Integer>("Homicide", 119));
+		// crSev.add(new Pair<String, Integer>("Rape", 96));
+		// crSev.add(new Pair<String, Integer>("Robbery", 52));
+		// crSev.add(new Pair<String, Integer>("Assault", 31));
+		// crSev.add(new Pair<String, Integer>("Arson", 38));
+		// crSev.add(new Pair<String, Integer>("Burglary", 26));
+		// crSev.add(new Pair<String, Integer>("Larceny-Theft", 17));
+		// crSev.add(new Pair<String, Integer>("Motor Vehicle Theft", 19));
 
 		LinkedHashMap<String, Integer> myMap = new LinkedHashMap<String, Integer>();
 		myMap.put("Homicide", 119);
@@ -574,7 +722,11 @@ public class WeGotDaBeat {
 		// Choices made, we can now cull our records
 		selecARec chosenOness = cullRecords(allDat, thCh, dateFormat, cc);
 		// END user interaction
-		countOcc(myMap, chosenOness, colDefs);
+
+		// HACK 0=person!
+		int crCl = 0;
+		int beatOrPrec = 0;
+		cntOcc(myMap, chosenOness, colDefs, crCl, beatOrPrec);
 
 		if (DEBUG) {
 			System.out.println("###INITIAL###");
