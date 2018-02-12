@@ -66,7 +66,8 @@ public class WeGotDaBeat {
 	 * @param cols
 	 *            String[] containing textual column definitions (from the
 	 *            header)
-	 * @return A magicTuple with column positions, all values found in certain fields, range of dates represented, and delimiter split rows
+	 * @return A magicTuple with column positions, all values found in certain
+	 *         fields, range of dates represented, and delimiter split rows
 	 * @throws IOException
 	 */
 	public static magicTuple structFromStream(String file, String del, String daFo, String[] cols) throws IOException {
@@ -583,7 +584,6 @@ public class WeGotDaBeat {
 	}
 
 	public static void displayRecs(LinkedHashMap<String, Integer> listOfCrimeScores, String key) {
-
 		System.out.printf("%-10s: %d crime prevalence score\n", key, listOfCrimeScores.get(key));
 	}
 
@@ -634,7 +634,7 @@ public class WeGotDaBeat {
 		final boolean DEBUG = false;
 		////
 
-		// BEGIN user interaction
+		//// BEGIN user interaction
 		// Obtain from user which file has the records (which will provide our
 		// data and the parameters of our options)
 		filename = input(filename);
@@ -650,17 +650,17 @@ public class WeGotDaBeat {
 		selecARec chosenOness = cullRecords(allDat, thCh, dateFormat, cc);
 		// END user interaction
 
-		// HACK 0=person!
-		int crCl = 0;
-		if (thCh.tyCh.equals("Property"))
-			crCl = 1;
-
-		System.out.println("Below follows data to assist you in determining the suitability of different areas for locating. \n" + 
-		"The more severe the crime, the greater an impact a single occurrence has. \n" + 
-				"We follow the methodology established by the Pew Charitable Trusts.");
+		//// BEGIN final output of results to console
+		System.out.println(
+				"Below follows data to assist you in determining the suitability of different areas for locating. \n"
+						+ "The more severe the crime, the greater an impact a single occurrence has. \n"
+						+ "We follow the methodology established by the Pew Charitable Trusts.");
 		System.out.println();
 		System.out.println("The weighted significances of criminal occurences within your chosen beat and timeframe:");
 		LinkedHashMap<String, Integer> beatWeigOcc = new LinkedHashMap<String, Integer>();
+		int crCl = 0;
+		if (thCh.tyCh.equals("Property"))
+			crCl = 1;
 		beatWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 0);
 		String key;
 		for (Map.Entry<String, Integer> entr : beatWeigOcc.entrySet()) {
@@ -668,7 +668,6 @@ public class WeGotDaBeat {
 			displayRecs(beatWeigOcc, key);
 		}
 		System.out.println();
-
 		System.out.println("Compared to the same measure across the whole precinct:");
 		LinkedHashMap<String, Integer> precWeigOcc = new LinkedHashMap<String, Integer>();
 		precWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 1);
@@ -678,8 +677,8 @@ public class WeGotDaBeat {
 			displayRecs(precWeigOcc, key);
 		}
 		System.out.println();
-
 		System.out.println("Good luck with your choice, and thanks for utilizing our service!");
+		// END non-debug execution
 
 		if (DEBUG) {
 			System.out.println("###INITIAL###");
@@ -697,7 +696,7 @@ public class WeGotDaBeat {
 			System.out.println();
 			System.out.println("###CHOSEN###");
 			src.debug.printDates(thCh.getDaCh(), dateFormat);
-			// src.debug.printArray(thCh.bpCh, ", ");
+			src.debug.printArray(thCh.bpCh, ", ");
 			System.out.println("TYPE CHOSEN: " + thCh.tyCh);
 			src.debug.printArray(chosenOness.beatRecs, "\t", true);
 			// src.debug.printArray(chosenOness.precRecs, "\t", true);
