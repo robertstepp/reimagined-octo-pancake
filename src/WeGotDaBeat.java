@@ -10,13 +10,10 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -26,8 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import javafx.util.Pair;
 
 public class WeGotDaBeat {
 	/////// 1st stage
@@ -477,61 +472,6 @@ public class WeGotDaBeat {
 		}
 		selecARec recBag = new selecARec(beatRecs, precRecs);
 		return recBag;
-	}
-
-	// https://stackoverflow.com/questions/29920027/how-can-i-sort-a-list-of-pairstring-integer
-	private static void countOcc(LinkedHashMap<String, Integer> crSev, selecARec arealOcc, String[] whichCol,
-			int crCl) {
-		ArrayList<String[]> beatRecs = arealOcc.beatRecs;
-		ArrayList<String[]> precRecs = arealOcc.precRecs;
-
-		LinkedHashMap<String, Integer> weightOccBeat = new LinkedHashMap<String, Integer>();
-		LinkedHashMap<String, Integer> weightOccPrec = new LinkedHashMap<String, Integer>();
-
-		// Person is crCl=0
-		weightOccBeat.put("Homicide", 0);
-		weightOccBeat.put("Rape", 0);
-		weightOccBeat.put("Robbery", 0);
-		weightOccBeat.put("Assault", 0);
-		weightOccPrec.put("Homicide", 0);
-		weightOccPrec.put("Rape", 0);
-		weightOccPrec.put("Robbery", 0);
-		weightOccPrec.put("Assault", 0);
-		// Property is 1
-		weightOccBeat.put("Arson", 0);
-		weightOccBeat.put("Burglary", 0);
-		weightOccBeat.put("Larceny-Theft", 0);
-		weightOccBeat.put("Motor Vehicle Theft", 0);
-		weightOccPrec.put("Arson", 0);
-		weightOccPrec.put("Burglary", 0);
-		weightOccPrec.put("Larceny-Theft", 0);
-		weightOccPrec.put("Motor Vehicle Theft", 0);
-
-		int definedWeight = 0;
-		int recOccs = 0;
-
-		int existTyScore = 0;
-		int newTyScore = 0;
-		// String recOccT = "";
-		// String recNum = "";
-		String recCrimeType = "";
-		for (String[] rec : beatRecs) {
-			// recNum = rec[7];
-			// recOccT = rec[3];
-			//
-			//
-			// System.out.println("" + definedWeight + "\t" + recNum + "\t" +
-			// recOccT);
-
-			recCrimeType = rec[1];
-
-			existTyScore = weightOccBeat.get(rec[1]);
-			newTyScore = existTyScore + (recOccs * definedWeight);
-			System.out.println(recCrimeType + "\t\t" + newTyScore);
-			definedWeight = crSev.get(recCrimeType);
-			recOccs = Integer.parseInt(rec[3]);
-			weightOccBeat.put(recCrimeType, weightOccBeat.get(recCrimeType) + (recOccs * definedWeight));
-		}
 	}
 
 	/**
