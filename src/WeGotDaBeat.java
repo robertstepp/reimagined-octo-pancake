@@ -650,7 +650,7 @@ public class WeGotDaBeat {
 
 	public static void displayRecs(LinkedHashMap<String, Integer> listOfCrimeScores, String key) {
 
-		System.out.printf("%-10s: %d crime prevalence\n", key, listOfCrimeScores.get(key));
+		System.out.printf("%-10s: %d crime prevalence score\n", key, listOfCrimeScores.get(key));
 	}
 
 	///////
@@ -721,8 +721,9 @@ public class WeGotDaBeat {
 		if (thCh.tyCh.equals("Property"))
 			crCl = 1;
 
-		System.out.println("Below follows data to assist you in determining the suitability of different areas for locating. " + 
-		"The more severe the crime, the greater an impact a single occurrence has. We follow the methodology established by the Pew Charitable Trusts.");
+		System.out.println("Below follows data to assist you in determining the suitability of different areas for locating. \n" + 
+		"The more severe the crime, the greater an impact a single occurrence has. \n" + 
+				"We follow the methodology established by the Pew Charitable Trusts.");
 		System.out.println();
 		System.out.println("The weighted significances of criminal occurences within your chosen beat and timeframe:");
 		LinkedHashMap<String, Integer> beatWeigOcc = new LinkedHashMap<String, Integer>();
