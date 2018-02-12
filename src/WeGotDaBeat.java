@@ -309,8 +309,6 @@ public class WeGotDaBeat {
 				anyParsFailed = true;
 			}
 
-			if (datesChosen[0].isAfter(datesChosen[1]))
-				System.out.println("That's not proper!");
 			if (anyParsFailed) {
 				if (begParsFailed && endParsFailed) {
 					JOptionPane.showConfirmDialog(null, "Unparseable dates.\nPlease enter in the format " + dateForm,
