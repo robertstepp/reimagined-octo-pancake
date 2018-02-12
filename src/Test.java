@@ -1,12 +1,14 @@
 package src;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import javafx.util.Pair;
 
 class Test {
 	/* This method returns a Pair which has maximum score */
-	public static Pair<String, Integer> getMaximum(ArrayList<Pair<String, Integer>> l) {
+	public static Pair<String, Integer> getMaximum(
+			ArrayList<Pair<String, Integer>> l) {
 		// Assign minimum value initially
 		int max = Integer.MIN_VALUE;
 
@@ -27,10 +29,20 @@ class Test {
 		return ans;
 	}
 
+	public static void displayRecs(
+			LinkedHashMap<String, Integer> listOfCrimeScores, String key) {
+
+		System.out.printf("%s: %d instances\n", key,
+				listOfCrimeScores.get(key));
+	}
+
 	// Driver method to test above method
 	public static void main(String[] args) {
 		int n = 5;// Number of Students
-
+		LinkedHashMap<String, Integer> listOfCrimeScores = new LinkedHashMap<String, Integer>();
+		listOfCrimeScores.put("Robbery", 10);
+		listOfCrimeScores.put("Burglery", 20);
+		displayRecs(listOfCrimeScores, "Robbery");
 		// Create an Array List
 		ArrayList<Pair<String, Integer>> l = new ArrayList<Pair<String, Integer>>();
 
@@ -47,6 +59,7 @@ class Test {
 		// get the Pair which has maximum value
 		Pair<String, Integer> ans = getMaximum(l);
 
-		System.out.println(ans.getKey() + " is top scorer " + "with score of " + ans.getValue());
+		System.out.println(ans.getKey() + " is top scorer " + "with score of "
+				+ ans.getValue());
 	}
 }
