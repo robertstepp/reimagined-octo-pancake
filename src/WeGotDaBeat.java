@@ -584,7 +584,7 @@ public class WeGotDaBeat {
 	}
 
 	public static void displayRecs(LinkedHashMap<String, Integer> listOfCrimeScores, String key) {
-		System.out.printf("%-10s: %d crime prevalence score\n", key, listOfCrimeScores.get(key));
+		System.out.printf("%-19s: %6d crime prevalence score\n", key, listOfCrimeScores.get(key));
 	}
 
 	///////
