@@ -25,28 +25,115 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class WeGotDaBeat {
+	/**
+	 * Display dialog box with passed error message
+	 * 
+	 * @param errorMessage
+	 */
+	public static void raiseError(String errorMessage) {
+		JOptionPane.showConfirmDialog(null, errorMessage, "Error", JOptionPane.DEFAULT_OPTION);
+	}
+
+	// Find column indices from keywords and header array
+	public static LinkedHashMap<String, Integer> columnPositions(String[] keyWords, String[] splitHeader) {
+		boolean DEBUG = true;
+		LinkedHashMap<String, Integer> fieldPositions = new LinkedHashMap<String, Integer>();
+		for (int i = 0; i < splitHeader.length; ++i) {
+			String columnTitle = splitHeader[i].toLowerCase();
+			for (String keyWord : keyWords)
+				if (columnTitle.contains(keyWord))
+					fieldPositions.put(keyWord, i);
+		}
+		if (DEBUG)
+			for (Map.Entry<String, Integer> entry : fieldPositions.entrySet())
+				System.out.println("\"" + entry.getKey() + "\" is found in column " + entry.getValue());
+		return fieldPositions;
+	}
+
+	// Next three return embedded data-specific knowledge
+	public static LinkedHashMap<String, String[]> beatsInPrecincts() {
+		// Beats are within precincts (we're ignoring sectors)
+		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
+		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3", "N1", "N2", "N3", "U1", "U2", "U3" };
+		pb.put("N", n);
+		String[] w = { "D1", "D2", "D3", "K1", "K2", "K3", "M1", "M2", "M3", "Q1", "Q2", "Q3" };
+		pb.put("W", w);
+		String[] e = { "C1", "C2", "C3", "E1", "E2", "E3", "G1", "G2", "G3" };
+		pb.put("E", e);
+		String[] se = { "O1", "O2", "O3", "R1", "R2", "R3", "S1", "S2", "S3" };
+		pb.put("SE", se);
+		String[] sw = { "F1", "F2", "F3", "W1", "W2", "W3" };
+		pb.put("SW", sw);
+
+		return pb;
+	}
+
+	public static LinkedHashMap<String, String[]> crimesInClasses() {
+		// Two general classes of crime
+		LinkedHashMap<String, String[]> cc = new LinkedHashMap<String, String[]>();
+		String[] crimeClasses = { "Person", "Property" };
+		String[] persCrim = { "Homicide", "Rape", "Robbery", "Assault" };
+		cc.put(crimeClasses[0], persCrim);
+		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft" };
+		cc.put(crimeClasses[1], propCrim);
+
+		return cc;
+	}
+
+	public static LinkedHashMap<String, Integer> severitiesOfCrimes() {
+		// Proportionate severity per crime
+		// See
+		// http://www.pewtrusts.org/en/research-and-analysis/issue-briefs/2016/03/the-punishment-rate
+		// and https://www.bjs.gov/index.cfm?ty=pbdetail&iid=2045
+		// ("Table 11. First releases from state prison, 2009: Sentence length
+		// and time served in prison, by offense and race")
+		// https://www.geeksforgeeks.org/pair-class-in-java/
+		LinkedHashMap<String, Integer> myMap = new LinkedHashMap<String, Integer>();
+		myMap.put("Homicide", 119);
+		myMap.put("Rape", 96);
+		myMap.put("Robbery", 52);
+		myMap.put("Assault", 31);
+		myMap.put("Arson", 38);
+		myMap.put("Burglary", 26);
+		myMap.put("Larceny-Theft", 17);
+		myMap.put("Motor Vehicle Theft", 19);
+
+		return myMap;
+	}
+
 	/////// 1st stage
 	/**
-	 * First interaction with the user. Asks for filepath and uses default
-	 * passed to it if their entry is blank
+	 * First user interaction, obtain filepath. Seed entry box with default
+	 * passed, and ensure filepath ends with the required extension
 	 * 
-	 * @param filename
-	 *            The file which'll will be returned if the user enters nothing
-	 * @return String containing the user's entered filename or, barring that,
-	 *         the default
+	 * @param filepath
+	 *            String containing path to database file
+	 * @param requiredExtension
+	 *            String of the required filename extension
+	 * @return String with the accepted path
 	 */
-	public static String input(String filename) {
-		JTextField preFilename = new JTextField();
-		preFilename.setText(filename);
-		JPanel inputFilename = new JPanel();
-		inputFilename.add(new JLabel("Filename: (case sensitive)"));
-		inputFilename.add(preFilename);
-		JOptionPane.showConfirmDialog(null, inputFilename, "Comma Separated Values file (.csv)",
-				JOptionPane.DEFAULT_OPTION);
-		String tempFilename = preFilename.getText();
-		if (tempFilename.length() > 0)
-			filename = tempFilename;
-		return filename;
+	public static String getDatabasePath(String filepath, String requiredExtension) {
+		boolean badInput = true;
+		while (badInput) {
+			JTextField preFilename = new JTextField();
+			preFilename.setText(filepath);
+			JPanel inputFilename = new JPanel();
+			inputFilename.add(new JLabel("File path: (case sensitive)"));
+			inputFilename.add(preFilename);
+
+			JOptionPane.showConfirmDialog(null, inputFilename, "File ending in \"" + requiredExtension + "\"",
+					JOptionPane.DEFAULT_OPTION);
+			filepath = preFilename.getText();
+
+			if (filepath.length() > 0)
+				if (filepath.endsWith(requiredExtension))
+					badInput = false;
+				else
+					raiseError("The filename must end with \"" + requiredExtension + "\".");
+			else
+				raiseError("You must provide an input database location!");
+		}
+		return filepath;
 	}
 
 	/////// 2nd
@@ -59,26 +146,27 @@ public class WeGotDaBeat {
 	 * 
 	 * @param file
 	 *            String path to the file to parse
-	 * @param del
+	 * @param columnDelim
 	 *            String delimiter which separates fields
-	 * @param daFo
+	 * @param dateFormat
 	 *            String date format which LocalDate parses with
-	 * @param cols
+	 * @param columnHeaders
 	 *            String[] containing textual column definitions (from the
 	 *            header)
 	 * @return A magicTuple with column positions, all values found in certain
 	 *         fields, range of dates represented, and delimiter split rows
 	 * @throws IOException
 	 */
-	public static magicTuple structFromStream(String file, String del, String daFo, String[] cols) throws IOException {
+	public static magicTuple structFromStream(String file, String columnDelim, String dateFormat,
+			String[] columnHeaders) throws IOException {
 		// The columnar positions of the fields we're recording possible values
 		// for
 		// Index [0=beat, 1=sector, 2=precinct, 3=date]
-		int[] whichCol = { -1, -1, -1, -1 };
 		// Assumption: first column containing any occurrence of the keyword is
-		// the one we want
-		for (int q = 0; q < cols.length; ++q) {
-			String col = cols[q].toLowerCase();
+		// the one we want and no column matches multiple
+		int[] whichCol = { -1, -1, -1, -1 };
+		for (int q = 0; q < columnHeaders.length; ++q) {
+			String col = columnHeaders[q].toLowerCase();
 			if ((whichCol[0] == -1) && (col.contains("beat")))
 				whichCol[0] = q;
 			else if ((whichCol[1] == -1) && (col.contains("sector")))
@@ -89,35 +177,33 @@ public class WeGotDaBeat {
 				whichCol[3] = q;
 		}
 
-		// For unique or extreme values for the fields we'll present for user
-		// selection
+		// Unique or extreme values found in the fields
 		ArrayList<String> beats = new ArrayList<String>();
 		ArrayList<String> sectors = new ArrayList<String>();
 		ArrayList<String> precincts = new ArrayList<String>();
 		// https://www.mkyong.com/java/how-to-compare-dates-in-java/
-		// ArrayList<LocalDate> dates = new ArrayList<LocalDate>();
-		LocalDate[] daDates = new LocalDate[2];
-
 		// https://docs.oracle.com/javase/tutorial/datetime/iso/format.html
-		// Index 0 "is" (will be) earliest date found
-		daDates[0] = LocalDate.now();
-		// Index 1 is latest date found
-		daDates[1] = LocalDate.of(1900, 1, 1);
-		// currDate is date of the current record
-		LocalDate currDate = LocalDate.of(1901, 1, 1);
+		// Index 0 will be earliest date found
+		// Index 1 will be latest date found
+		// currDate will be date of the current record
+		LocalDate[] daDates = new LocalDate[2];
+		daDates[0] = LocalDate.MAX;
+		daDates[1] = LocalDate.MIN;
+		LocalDate currDate = LocalDate.of(1900, 1, 1);
 
 		ArrayList<String[]> theRecords = new ArrayList<String[]>();
 		theRecords.ensureCapacity(numberOfRows(file));
+		String[] splitLine;
+
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		// Ditch first line (presumed header)
 		br.readLine();
-		// Should this be a do-while loop? Not very important
 		String curLine = br.readLine();
-		String[] splitLine;
+
 		while (curLine != null) {
-			splitLine = listFromString(curLine, del);
+			splitLine = listFromString(curLine, columnDelim);
 			// Discard record if different number of columns than header
-			if (splitLine.length == cols.length) {
+			if (splitLine.length == columnHeaders.length) {
 				theRecords.add(splitLine);
 				// Add each unique occurrence of beats, sectors, and precincts
 				// to our lists of possibilities
@@ -128,7 +214,7 @@ public class WeGotDaBeat {
 				if (!(precincts.contains(splitLine[whichCol[2]])))
 					precincts.add(splitLine[whichCol[2]]);
 				// Turn our date string into a LocalDate
-				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(daFo));
+				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(dateFormat));
 				// If the current record's date is earlier and/or later than our
 				// thus-far-seen extremes, it becomes the new extreme(s)
 				if (currDate.isBefore(daDates[0]))
@@ -308,38 +394,28 @@ public class WeGotDaBeat {
 
 			if (anyParsFailed) {
 				if (begParsFailed && endParsFailed) {
-					JOptionPane.showConfirmDialog(null, "Unparseable dates.\nPlease enter in the format " + dateForm,
-							"Error", JOptionPane.DEFAULT_OPTION);
+					raiseError("Unparseable dates.\nPlease enter in the format " + dateForm + ".");
 				} else {
 					if (begParsFailed)
-						JOptionPane.showConfirmDialog(null,
-								"Unparseable beginning date.\nPlease enter in the format " + dateForm, "Error",
-								JOptionPane.DEFAULT_OPTION);
+						raiseError("Unparseable beginning date.\nPlease enter in the format " + dateForm + ".");
 					else if (endParsFailed)
-						JOptionPane.showConfirmDialog(null,
-								"Unparseable ending date.\nPlease enter in the format " + dateForm, "Error",
-								JOptionPane.DEFAULT_OPTION);
+						raiseError("Unparseable ending date.\nPlease enter in the format " + dateForm + ".");
 				}
 			} else {
 				if (!datesChosen[0].isBefore(dateLims[0]))
 					begInRng = true;
 				else
-					JOptionPane.showConfirmDialog(null,
-							"Beginning date too early.\nCan't be earlier than " + dateLimsS[0] + ".", "Error",
-							JOptionPane.DEFAULT_OPTION);
+					raiseError("Beginning date too early.\nCan't be earlier than " + dateLimsS[0] + ".");
 				if (!datesChosen[1].isAfter(dateLims[1]))
 					endInRng = true;
 				else
-					JOptionPane.showConfirmDialog(null,
-							"Beginning date too late.\nCan't be later than " + dateLimsS[1] + ".", "Error",
-							JOptionPane.DEFAULT_OPTION);
+					raiseError("Beginning date too late.\nCan't be later than " + dateLimsS[1] + ".");
 				if (!datesChosen[0].equals(LocalDate.MAX))
 					if (!datesChosen[1].equals(LocalDate.MIN))
 						if (!datesChosen[0].isAfter(datesChosen[1]))
 							begAfterEnd = false;
 						else
-							JOptionPane.showConfirmDialog(null, "Dates are in reversed order.", "Error",
-									JOptionPane.DEFAULT_OPTION);
+							raiseError("Dates are in reversed order.");
 			}
 			if (begInRng && endInRng)
 				if (!(begAfterEnd || anyParsFailed))
@@ -591,63 +667,35 @@ public class WeGotDaBeat {
 	///////
 	public static void main(String[] args) throws IOException {
 		// Defaults/constants/hardcodes
+		String reqExt = ".csv";
+		String delimiter = ","; // csv, see?
 		String filename = "not-src/Seattle_Crime_Stats_by_Police_Precinct_2008-Present.csv";
 		String mapLoc = "not-src/beat-map-2.png";
-		String delimiter = ",";
 		String dateFormat = "M/d/yyyy";
-		// Beats are within precincts (we're ignoring sectors)
-		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
-		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3", "N1", "N2", "N3", "U1", "U2", "U3" };
-		pb.put("N", n);
-		String[] w = { "D1", "D2", "D3", "K1", "K2", "K3", "M1", "M2", "M3", "Q1", "Q2", "Q3" };
-		pb.put("W", w);
-		String[] e = { "C1", "C2", "C3", "E1", "E2", "E3", "G1", "G2", "G3" };
-		pb.put("E", e);
-		String[] se = { "O1", "O2", "O3", "R1", "R2", "R3", "S1", "S2", "S3" };
-		pb.put("SE", se);
-		String[] sw = { "F1", "F2", "F3", "W1", "W2", "W3" };
-		pb.put("SW", sw);
-		// Two general classes of crime
-		LinkedHashMap<String, String[]> cc = new LinkedHashMap<String, String[]>();
-		String[] crimeClasses = { "Person", "Property" };
-		String[] persCrim = { "Homicide", "Rape", "Robbery", "Assault" };
-		cc.put(crimeClasses[0], persCrim);
-		String[] propCrim = { "Arson", "Burglary", "Larceny-Theft", "Motor Vehicle Theft" };
-		cc.put(crimeClasses[1], propCrim);
-		// Proportionate severity per crime
-		// See
-		// http://www.pewtrusts.org/en/research-and-analysis/issue-briefs/2016/03/the-punishment-rate
-		// and https://www.bjs.gov/index.cfm?ty=pbdetail&iid=2045
-		// ("Table 11. First releases from state prison, 2009: Sentence length
-		// and time served in prison, by offense and race")
-		// https://www.geeksforgeeks.org/pair-class-in-java/
-		LinkedHashMap<String, Integer> myMap = new LinkedHashMap<String, Integer>();
-		myMap.put("Homicide", 119);
-		myMap.put("Rape", 96);
-		myMap.put("Robbery", 52);
-		myMap.put("Assault", 31);
-		myMap.put("Arson", 38);
-		myMap.put("Burglary", 26);
-		myMap.put("Larceny-Theft", 17);
-		myMap.put("Motor Vehicle Theft", 19);
+		// More specific to our data
+		String[] keyWords = { "beat", "type", "stat_val", "date", "sector", "precinct" };
+		LinkedHashMap<String, String[]> beatsInPrecincts = beatsInPrecincts();
+		LinkedHashMap<String, String[]> crimesInClasses = crimesInClasses();
+		LinkedHashMap<String, Integer> severitiesOfCrimes = severitiesOfCrimes();
 		////
 		final boolean DEBUG = false;
 		////
 
 		//// BEGIN user interaction
-		// Obtain from user which file has the records (which will provide our
-		// data and the parameters of our options)
-		filename = input(filename);
+		// Ask where to find out database (default localtion and required extension)
+		filename = getDatabasePath(filename, reqExt);
 		String[] colDefs = getColDefs(filename, delimiter);
+		LinkedHashMap<String, Integer> fieldPositions = columnPositions(keyWords, colDefs);
 		// Now that we know our header, we can parse our file into structured
 		// data
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
 		// With our structured data, we can ask the user their choice among the
 		// possibilities
-		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, pb, allDat.getTextVals().get(0),
-				allDat.getTextVals().get(2), crimeClasses);
+		String[] twoTypes = {"Person","Property"};
+		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, beatsInPrecincts, allDat.getTextVals().get(0),
+				allDat.getTextVals().get(2), twoTypes);
 		// Choices made, we can now cull our records
-		selecARec chosenOness = cullRecords(allDat, thCh, dateFormat, cc);
+		selecARec chosenOness = cullRecords(allDat, thCh, dateFormat, crimesInClasses);
 		// END user interaction
 
 		//// BEGIN final output of results to console
@@ -661,7 +709,7 @@ public class WeGotDaBeat {
 		int crCl = 0;
 		if (thCh.tyCh.equals("Property"))
 			crCl = 1;
-		beatWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 0);
+		beatWeigOcc = cntOcc(severitiesOfCrimes, chosenOness, colDefs, crCl, 0);
 		String key;
 		for (Map.Entry<String, Integer> entr : beatWeigOcc.entrySet()) {
 			key = entr.getKey();
@@ -670,7 +718,7 @@ public class WeGotDaBeat {
 		System.out.println();
 		System.out.println("Compared to the same measure across the whole precinct:");
 		LinkedHashMap<String, Integer> precWeigOcc = new LinkedHashMap<String, Integer>();
-		precWeigOcc = cntOcc(myMap, chosenOness, colDefs, crCl, 1);
+		precWeigOcc = cntOcc(severitiesOfCrimes, chosenOness, colDefs, crCl, 1);
 		key = "";
 		for (Map.Entry<String, Integer> entr : precWeigOcc.entrySet()) {
 			key = entr.getKey();
