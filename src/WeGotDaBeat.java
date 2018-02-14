@@ -51,18 +51,25 @@ public class WeGotDaBeat {
 	}
 
 	// Next three return embedded data-specific knowledge
-	public static LinkedHashMap<String, String[]> beatsInPrecincts() {
+	public static LinkedHashMap<String, ArrayList<String>> beatsInPrecincts() {
 		// Beats are within precincts (we're ignoring sectors)
-		LinkedHashMap<String, String[]> pb = new LinkedHashMap<String, String[]>();
-		String[] n = { "B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3", "N1", "N2", "N3", "U1", "U2", "U3" };
+		LinkedHashMap<String, ArrayList<String>> pb = new LinkedHashMap<String, ArrayList<String>>();
+
+		ArrayList<String> n = new ArrayList<String>();
+		ArrayList<String> w = new ArrayList<String>();
+		ArrayList<String> e = new ArrayList<String>();
+		ArrayList<String> se = new ArrayList<String>();
+		ArrayList<String> sw = new ArrayList<String>();
+		n.addAll(Arrays.asList("B1", "B2", "B3", "J1", "J2", "J3", "L1", "L2", "L3", "N1", "N2", "N3", "U1", "U2",
+				"U3"));
+		w.addAll(Arrays.asList("D1", "D2", "D3", "K1", "K2", "K3", "M1", "M2", "M3", "Q1", "Q2", "Q3"));
+		e.addAll(Arrays.asList("C1", "C2", "C3", "E1", "E2", "E3", "G1", "G2", "G3"));
+		se.addAll(Arrays.asList("O1", "O2", "O3", "R1", "R2", "R3", "S1", "S2", "S3"));
+		sw.addAll(Arrays.asList("F1", "F2", "F3", "W1", "W2", "W3"));
 		pb.put("N", n);
-		String[] w = { "D1", "D2", "D3", "K1", "K2", "K3", "M1", "M2", "M3", "Q1", "Q2", "Q3" };
 		pb.put("W", w);
-		String[] e = { "C1", "C2", "C3", "E1", "E2", "E3", "G1", "G2", "G3" };
 		pb.put("E", e);
-		String[] se = { "O1", "O2", "O3", "R1", "R2", "R3", "S1", "S2", "S3" };
 		pb.put("SE", se);
-		String[] sw = { "F1", "F2", "F3", "W1", "W2", "W3" };
 		pb.put("SW", sw);
 
 		return pb;
@@ -321,7 +328,7 @@ public class WeGotDaBeat {
 	 *            String ArrayList of precinct options
 	 */
 	public static decisions getChoices(String dateForm, LocalDate[] dateLimits, String imgLoc,
-			LinkedHashMap<String, String[]> bpAssoc, String[] beatOpts, String[] precOpts, String[] typeOpts) {
+			LinkedHashMap<String, ArrayList<String>> bpAssoc, String[] beatOpts, String[] precOpts, String[] typeOpts) {
 		// Get user's chosen min/max dates
 		LocalDate[] daChoice = getDateRange(dateForm, dateLimits);
 		// Show user the beat(/sector)/precinct map to aid their areal choosings
@@ -458,7 +465,7 @@ public class WeGotDaBeat {
 	 *            A String[] of all the precinct possibilities
 	 * @return
 	 */
-	public static String[] getBeatPrecinct(LinkedHashMap<String, String[]> bpAssoc, String[] theBeats,
+	public static String[] getBeatPrecinct(LinkedHashMap<String, ArrayList<String>> bpAssoc, String[] theBeats,
 			String[] thePrecincts) {
 		boolean theWorldIsGood = false;
 		String bc = "", pc = "";
@@ -478,7 +485,8 @@ public class WeGotDaBeat {
 
 			bc = theBeats[be.getSelectedIndex()];
 			pc = thePrecincts[prec.getSelectedIndex()];
-			if (Arrays.asList(bpAssoc.get(pc)).contains(bc))
+			if (bpAssoc.get(pc).contains(bc))
+//			if (Arrays.asList(bpAssoc.get(pc)).contains(bc))
 				theWorldIsGood = true;
 		}
 		String[] bpChoice = { pc, bc };
@@ -673,8 +681,8 @@ public class WeGotDaBeat {
 		String mapLoc = "not-src/beat-map-2.png";
 		String dateFormat = "M/d/yyyy";
 		// More specific to our data
-		String[] keyWords = { "beat", "type", "stat_val", "date", "sector", "precinct" };
-		LinkedHashMap<String, String[]> beatsInPrecincts = beatsInPrecincts();
+		//String[] keyWords = { "beat", "type", "stat_val", "date", "sector", "precinct" };
+		LinkedHashMap<String, ArrayList<String>> beatsInPrecincts = beatsInPrecincts();
 		LinkedHashMap<String, String[]> crimesInClasses = crimesInClasses();
 		LinkedHashMap<String, Integer> severitiesOfCrimes = severitiesOfCrimes();
 		////
@@ -682,16 +690,17 @@ public class WeGotDaBeat {
 		////
 
 		//// BEGIN user interaction
-		// Ask where to find out database (default localtion and required extension)
+		// Ask where to find out database (default localtion and required
+		//// extension)
 		filename = getDatabasePath(filename, reqExt);
 		String[] colDefs = getColDefs(filename, delimiter);
-		LinkedHashMap<String, Integer> fieldPositions = columnPositions(keyWords, colDefs);
+		//LinkedHashMap<String, Integer> fieldPositions = columnPositions(keyWords, colDefs);
 		// Now that we know our header, we can parse our file into structured
 		// data
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
 		// With our structured data, we can ask the user their choice among the
 		// possibilities
-		String[] twoTypes = {"Person","Property"};
+		String[] twoTypes = { "Person", "Property" };
 		decisions thCh = getChoices(dateFormat, allDat.dateVals, mapLoc, beatsInPrecincts, allDat.getTextVals().get(0),
 				allDat.getTextVals().get(2), twoTypes);
 		// Choices made, we can now cull our records
