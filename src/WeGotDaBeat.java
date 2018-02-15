@@ -120,6 +120,8 @@ public class WeGotDaBeat {
 	 * @return String with the accepted path
 	 */
 	public static String getDatabasePath(String filepath, String requiredExtension) {
+		System.out.println("ENTERING ENTERING getDatabasePath");
+
 		boolean badInput = true;
 		while (badInput) {
 			JTextField preFilename = new JTextField();
@@ -140,6 +142,8 @@ public class WeGotDaBeat {
 			else
 				raiseError("You must provide an input database location!");
 		}
+		System.out.println("exiting exiting getDatabasePath");
+
 		return filepath;
 	}
 
@@ -166,6 +170,7 @@ public class WeGotDaBeat {
 	 */
 	public static magicTuple structFromStream(String file, String columnDelim, String dateFormat,
 			LinkedHashMap<String, Integer> columnHeaders) throws IOException {
+		System.out.println("ENTERING structFromStream");
 		// The columnar positions of the fields we're recording possible values
 		// for
 		// Index [0=beat, 1=sector, 2=precinct, 3=date]
@@ -195,32 +200,44 @@ public class WeGotDaBeat {
 		br.readLine();
 		String curLine = br.readLine();
 
-		System.out.println("datesssss" + daDates[0] + " " + daDates[1]+ " " + columnHeaders.get("date"));
-		
 		while (curLine != null) {
 			splitLine = listFromString(curLine, columnDelim);
-			System.out.println(splitLine[columnHeaders.get("date")]);
+			// System.out.println(splitLine[columnHeaders.get("date")]);
 			// Discard record if different number of columns than header
-			if (splitLine.length == columnHeaders.size()) {
-				theRecords.add(splitLine);
-				// Add each unique occurrence of beats, sectors, and precincts
-				// to our lists of possibilities
-				if (!(beats.contains(splitLine[columnHeaders.get("beat")])))
-					beats.add(splitLine[columnHeaders.get("beat")]);
-				if (!(sectors.contains(splitLine[columnHeaders.get("sector")])))
-					sectors.add(splitLine[columnHeaders.get("sector")]);
-				if (!(precincts.contains(splitLine[columnHeaders.get("precinct")])))
-					precincts.add(splitLine[columnHeaders.get("precinct")]);
-				// Turn our date string into a LocalDate
-				currDate = LocalDate.parse(splitLine[columnHeaders.get("date")],
-						DateTimeFormatter.ofPattern(dateFormat));
-				// If the current record's date is earlier and/or later than our
-				// thus-far-seen extremes, it becomes the new extreme(s)
-				if (currDate.isBefore(daDates[0]))
-					daDates[0] = currDate;
-				if (currDate.isAfter(daDates[1]))
-					daDates[1] = currDate;
+			// TODO: I changed the meaning of columnHeaders, as
+			// now it's 6 long, which doesn't match the splitLine length of 8
+			// splitLine contains:
+			// Police
+			// Beat,CRIME_TYPE,CRIME_DESCRIPTION,STAT_VALUE,REPORT_DATE,Sector,Precinct,Row_Value_ID
+			// columnHeaders is ignoring description and row ID
+			// b/c of what I discuss here, the check for number of records vs
+			// number of columns is no longer valid
+			// if (splitLine.length == columnHeaders.keySet().size()) {
+			theRecords.add(splitLine);
+			// Add each unique occurrence of beats, sectors, and precincts
+			// to our lists of possibilities
+			if (!(beats.contains(splitLine[columnHeaders.get("beat")])))
+				beats.add(splitLine[columnHeaders.get("beat")]);
+			if (!(sectors.contains(splitLine[columnHeaders.get("sector")])))
+				sectors.add(splitLine[columnHeaders.get("sector")]);
+			if (!(precincts.contains(splitLine[columnHeaders.get("precinct")])))
+				precincts.add(splitLine[columnHeaders.get("precinct")]);
+			// Turn our date string into a LocalDate
+			// System.out.println("" + columnHeaders.get("date"));
+			currDate = LocalDate.parse(splitLine[columnHeaders.get("date")], DateTimeFormatter.ofPattern(dateFormat));
+			// If the current record's date is earlier and/or later than our
+			// thus-far-seen extremes, it becomes the new extreme(s)
+			if (currDate.isBefore(daDates[0])) {
+				// System.out.println("Current date is before exising
+				// earliest");
+				daDates[0] = currDate;
 			}
+			if (currDate.isAfter(daDates[1])) {
+				// System.out.println("Current date is after exising
+				// earliest");
+				daDates[1] = currDate;
+			}
+			// }
 			curLine = br.readLine();
 		}
 		br.close();
@@ -240,11 +257,15 @@ public class WeGotDaBeat {
 		textVals.add(daPrecincts);
 
 		magicTuple allTheThings = new magicTuple(columnHeaders, textVals, daDates, theRecords);
+		System.out.println("exiting exiting structFromStream");
+
 		return allTheThings;
 	}
 
 	public static LinkedHashMap<String, Integer> getColDefs(String file, String delim, String[] keywords)
 			throws IOException {
+		System.out.println("ENTERING ENTERING getColDegs");
+
 		BufferedReader br = new BufferedReader(new FileReader(file));
 
 		LinkedHashMap<String, Integer> columnPositions = new LinkedHashMap<String, Integer>();
@@ -256,6 +277,8 @@ public class WeGotDaBeat {
 					columnPositions.put(key, c);
 
 		br.close();
+		System.out.println("exiting exiting getColDegs");
+
 		return columnPositions;
 	}
 
@@ -344,6 +367,8 @@ public class WeGotDaBeat {
 	 *            permissible date, second latest
 	 */
 	public static LocalDate[] getDateRange(String dateForm, LocalDate[] dateLims) {
+		System.out.println("ENTERING ENTERING getDateRange");
+
 		LocalDate[] datesChosen = new LocalDate[2];
 		datesChosen[0] = LocalDate.MAX;
 		datesChosen[1] = LocalDate.MIN;
@@ -554,7 +579,7 @@ public class WeGotDaBeat {
 	 *            If 0, return beat, if else return precinct
 	 */
 	private static LinkedHashMap<String, Integer> cntOcc(LinkedHashMap<String, Integer> crSev, selecARec records,
-			LinkedHashMap<String,Integer> whichCol, int pePr, int bePr) {
+			LinkedHashMap<String, Integer> whichCol, int pePr, int bePr) {
 		boolean deb = false;
 		LinkedHashMap<String, Integer> ita = new LinkedHashMap<String, Integer>();
 		if (bePr == 0) {
@@ -676,15 +701,17 @@ public class WeGotDaBeat {
 		LinkedHashMap<String, String[]> crimesInClasses = crimesInClasses();
 		LinkedHashMap<String, Integer> severitiesOfCrimes = severitiesOfCrimes();
 		////
-		final boolean DEBUG = true;
+		final boolean DEBUG = false;
 		////
 
 		//// BEGIN user interaction
-		// Ask where to find out database (default location and required
-		// extension)
+		// Ask where to find out database (default localtion and required
+		//// extension)
 		filename = getDatabasePath(filename, reqExt);
+
 		LinkedHashMap<String, Integer> colDefs = new LinkedHashMap<String, Integer>();
 		colDefs = getColDefs(filename, delimiter, keywords);
+
 		// LinkedHashMap<String, Integer> fieldPositions =
 		// columnPositions(keyWords, colDefs);
 		// Now that we know our header, we can parse our file into structured
@@ -736,7 +763,7 @@ public class WeGotDaBeat {
 			src.debug.printArray(allDat.getTextVals().get(1), ",");
 			src.debug.printArray(allDat.getTextVals().get(2), ",");
 			System.out.println();
-			//src.debug.printArray(colDefs, " \t ");
+			// src.debug.printArray(colDefs, " \t ");
 			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			// src.debug.printArray(allDat.getTheRecs(), " \t ", true);
 			System.out.println();
