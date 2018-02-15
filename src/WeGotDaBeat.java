@@ -165,24 +165,12 @@ public class WeGotDaBeat {
 	 * @throws IOException
 	 */
 	public static magicTuple structFromStream(String file, String columnDelim, String dateFormat,
-			String[] columnHeaders) throws IOException {
+			LinkedHashMap<String, Integer> columnHeaders) throws IOException {
 		// The columnar positions of the fields we're recording possible values
 		// for
 		// Index [0=beat, 1=sector, 2=precinct, 3=date]
 		// Assumption: first column containing any occurrence of the keyword is
 		// the one we want and no column matches multiple
-		int[] whichCol = { -1, -1, -1, -1 };
-		for (int q = 0; q < columnHeaders.length; ++q) {
-			String col = columnHeaders[q].toLowerCase();
-			if ((whichCol[0] == -1) && (col.contains("beat")))
-				whichCol[0] = q;
-			else if ((whichCol[1] == -1) && (col.contains("sector")))
-				whichCol[1] = q;
-			else if ((whichCol[2] == -1) && (col.contains("precinct")))
-				whichCol[2] = q;
-			else if ((whichCol[3] == -1) && (col.contains("date")))
-				whichCol[3] = q;
-		}
 
 		// Unique or extreme values found in the fields
 		ArrayList<String> beats = new ArrayList<String>();
@@ -207,21 +195,25 @@ public class WeGotDaBeat {
 		br.readLine();
 		String curLine = br.readLine();
 
+		System.out.println("datesssss" + daDates[0] + " " + daDates[1]+ " " + columnHeaders.get("date"));
+		
 		while (curLine != null) {
 			splitLine = listFromString(curLine, columnDelim);
+			System.out.println(splitLine[columnHeaders.get("date")]);
 			// Discard record if different number of columns than header
-			if (splitLine.length == columnHeaders.length) {
+			if (splitLine.length == columnHeaders.size()) {
 				theRecords.add(splitLine);
 				// Add each unique occurrence of beats, sectors, and precincts
 				// to our lists of possibilities
-				if (!(beats.contains(splitLine[whichCol[0]])))
-					beats.add(splitLine[whichCol[0]]);
-				if (!(sectors.contains(splitLine[whichCol[1]])))
-					sectors.add(splitLine[whichCol[1]]);
-				if (!(precincts.contains(splitLine[whichCol[2]])))
-					precincts.add(splitLine[whichCol[2]]);
+				if (!(beats.contains(splitLine[columnHeaders.get("beat")])))
+					beats.add(splitLine[columnHeaders.get("beat")]);
+				if (!(sectors.contains(splitLine[columnHeaders.get("sector")])))
+					sectors.add(splitLine[columnHeaders.get("sector")]);
+				if (!(precincts.contains(splitLine[columnHeaders.get("precinct")])))
+					precincts.add(splitLine[columnHeaders.get("precinct")]);
 				// Turn our date string into a LocalDate
-				currDate = LocalDate.parse(splitLine[whichCol[3]], DateTimeFormatter.ofPattern(dateFormat));
+				currDate = LocalDate.parse(splitLine[columnHeaders.get("date")],
+						DateTimeFormatter.ofPattern(dateFormat));
 				// If the current record's date is earlier and/or later than our
 				// thus-far-seen extremes, it becomes the new extreme(s)
 				if (currDate.isBefore(daDates[0]))
@@ -247,28 +239,24 @@ public class WeGotDaBeat {
 		textVals.add(daSectors);
 		textVals.add(daPrecincts);
 
-		magicTuple allTheThings = new magicTuple(whichCol, textVals, daDates, theRecords);
+		magicTuple allTheThings = new magicTuple(columnHeaders, textVals, daDates, theRecords);
 		return allTheThings;
 	}
 
-	/**
-	 * getColDefs finds column definitions from a text file's header
-	 * (Assumption: single line header.)
-	 * 
-	 * @param file
-	 *            A String telling us the file's location
-	 * @param delim
-	 *            The splitting delimiter as a String
-	 * @return A String ArrayList containing the column headings
-	 * @throws IOException
-	 */
-	public static String[] getColDefs(String file, String delim) throws IOException {
+	public static LinkedHashMap<String, Integer> getColDefs(String file, String delim, String[] keywords)
+			throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(file));
-		// ArrayList<String> cols = new
-		// ArrayList<>(Arrays.asList(br.readLine().split(delim)));
+
+		LinkedHashMap<String, Integer> columnPositions = new LinkedHashMap<String, Integer>();
 		String[] columns = listFromString(br.readLine(), delim);
+
+		for (int c = 0; c < columns.length; ++c)
+			for (String key : keywords)
+				if (columns[c].toLowerCase().contains(key))
+					columnPositions.put(key, c);
+
 		br.close();
-		return columns;
+		return columnPositions;
 	}
 
 	/**
@@ -486,7 +474,7 @@ public class WeGotDaBeat {
 			bc = theBeats[be.getSelectedIndex()];
 			pc = thePrecincts[prec.getSelectedIndex()];
 			if (bpAssoc.get(pc).contains(bc))
-//			if (Arrays.asList(bpAssoc.get(pc)).contains(bc))
+				// if (Arrays.asList(bpAssoc.get(pc)).contains(bc))
 				theWorldIsGood = true;
 		}
 		String[] bpChoice = { pc, bc };
@@ -530,7 +518,9 @@ public class WeGotDaBeat {
 	 */
 	private static selecARec cullRecords(magicTuple allDat, decisions thCh, String dateForm,
 			LinkedHashMap<String, String[]> crimeCateg) {
-		int dateCol = allDat.colPos[3], precCol = allDat.colPos[2], beatCol = allDat.colPos[0];
+		int dateCol = allDat.colPos.get("date");
+		int precCol = allDat.colPos.get("precinct");
+		int beatCol = allDat.colPos.get("beat");
 		LocalDate minDate = thCh.daCh[0], maxDate = thCh.daCh[1];
 		String precReq = thCh.bpCh[0], beatReq = thCh.bpCh[1];
 
@@ -564,7 +554,7 @@ public class WeGotDaBeat {
 	 *            If 0, return beat, if else return precinct
 	 */
 	private static LinkedHashMap<String, Integer> cntOcc(LinkedHashMap<String, Integer> crSev, selecARec records,
-			String[] whichCol, int pePr, int bePr) {
+			LinkedHashMap<String,Integer> whichCol, int pePr, int bePr) {
 		boolean deb = false;
 		LinkedHashMap<String, Integer> ita = new LinkedHashMap<String, Integer>();
 		if (bePr == 0) {
@@ -681,20 +671,22 @@ public class WeGotDaBeat {
 		String mapLoc = "not-src/beat-map-2.png";
 		String dateFormat = "M/d/yyyy";
 		// More specific to our data
-		//String[] keyWords = { "beat", "type", "stat_val", "date", "sector", "precinct" };
+		String[] keywords = { "beat", "type", "stat_val", "date", "sector", "precinct" };
 		LinkedHashMap<String, ArrayList<String>> beatsInPrecincts = beatsInPrecincts();
 		LinkedHashMap<String, String[]> crimesInClasses = crimesInClasses();
 		LinkedHashMap<String, Integer> severitiesOfCrimes = severitiesOfCrimes();
 		////
-		final boolean DEBUG = false;
+		final boolean DEBUG = true;
 		////
 
 		//// BEGIN user interaction
 		// Ask where to find out database (default localtion and required
 		//// extension)
 		filename = getDatabasePath(filename, reqExt);
-		String[] colDefs = getColDefs(filename, delimiter);
-		//LinkedHashMap<String, Integer> fieldPositions = columnPositions(keyWords, colDefs);
+		LinkedHashMap<String, Integer> colDefs = new LinkedHashMap<String, Integer>();
+		colDefs = getColDefs(filename, delimiter, keywords);
+		// LinkedHashMap<String, Integer> fieldPositions =
+		// columnPositions(keyWords, colDefs);
 		// Now that we know our header, we can parse our file into structured
 		// data
 		magicTuple allDat = structFromStream(filename, delimiter, dateFormat, colDefs);
@@ -744,7 +736,7 @@ public class WeGotDaBeat {
 			src.debug.printArray(allDat.getTextVals().get(1), ",");
 			src.debug.printArray(allDat.getTextVals().get(2), ",");
 			System.out.println();
-			src.debug.printArray(colDefs, " \t ");
+			//src.debug.printArray(colDefs, " \t ");
 			System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			// src.debug.printArray(allDat.getTheRecs(), " \t ", true);
 			System.out.println();

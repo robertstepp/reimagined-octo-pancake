@@ -3,18 +3,19 @@ package src;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 // https://stackoverflow.com/questions/19602601/create-an-arraylist-with-multiple-object-types
 // I'd like to take this opportunity to thank Eclipse's "generate getters and setters!"  :]
 class magicTuple {
-	int[] colPos;
+	LinkedHashMap<String,Integer> colPos = new LinkedHashMap<String,Integer>();
 	// first String[] is beats opts, second is prec opts
 	ArrayList<String[]> textVals = new ArrayList<String[]>();
 	// the extremes of dates represented in the records
 	LocalDate[] dateVals = new LocalDate[2];
 	ArrayList<String[]> theRecs = new ArrayList<String[]>();
 
-	magicTuple(int[] colPos, ArrayList<String[]> textVals, LocalDate[] dateVals,
+	magicTuple(LinkedHashMap<String,Integer> colPos, ArrayList<String[]> textVals, LocalDate[] dateVals,
 			ArrayList<String[]> theRecs) {
 		this.colPos = colPos;
 		this.textVals = textVals;
@@ -25,7 +26,7 @@ class magicTuple {
 	/**
 	 * @return the colPos
 	 */
-	public int[] getColPos() {
+	public LinkedHashMap<String,Integer> getColPos() {
 		return colPos;
 	}
 
@@ -54,7 +55,7 @@ class magicTuple {
 	 * @param colPos
 	 *            the colPos to set
 	 */
-	public void setColPos(int[] colPos) {
+	public void setColPos(LinkedHashMap<String,Integer> colPos) {
 		this.colPos = colPos;
 	}
 
