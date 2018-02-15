@@ -680,8 +680,8 @@ public class WeGotDaBeat {
 		////
 
 		//// BEGIN user interaction
-		// Ask where to find out database (default localtion and required
-		//// extension)
+		// Ask where to find out database (default location and required
+		// extension)
 		filename = getDatabasePath(filename, reqExt);
 		LinkedHashMap<String, Integer> colDefs = new LinkedHashMap<String, Integer>();
 		colDefs = getColDefs(filename, delimiter, keywords);
